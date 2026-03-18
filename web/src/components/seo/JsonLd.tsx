@@ -51,7 +51,7 @@ export function ProductSchema({ name, description, image, price, currency = 'RUB
 }
 
 interface BreadcrumbSchemaProps {
-  items: { name: string; url: string }[]
+  items: { name: string; url?: string }[]
 }
 
 export function BreadcrumbSchema({ items }: BreadcrumbSchemaProps) {
@@ -62,7 +62,7 @@ export function BreadcrumbSchema({ items }: BreadcrumbSchemaProps) {
       '@type': 'ListItem',
       position: i + 1,
       name: item.name,
-      item: item.url,
+      ...(item.url ? { item: item.url } : {}),
     })),
   }
 

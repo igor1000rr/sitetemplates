@@ -74,7 +74,7 @@ export default async function TemplatePage({ params }: Props) {
       <BreadcrumbSchema items={[
         { name: 'Главная', url: 'https://templatename.ru' },
         { name: 'Каталог', url: 'https://templatename.ru/templates' },
-        { name: t.category?.name, url: `https://templatename.ru/templates?category=${t.category?.slug}` },
+        ...(t.category ? [{ name: t.category.name, url: `https://templatename.ru/templates?category=${t.category.slug}` }] : []),
         { name: t.title, url: `https://templatename.ru/templates/${t.slug}` },
       ]} />
 
