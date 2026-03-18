@@ -60,7 +60,7 @@ export default function EmailCapture() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[52] p-4 animate-slide-up">
-      <div className="max-w-[520px] mx-auto bg-bg-card border border-accent/15 rounded-2xl shadow-[0_-10px_40px_rgba(139,92,246,0.1)] p-5">
+      <div className="max-w-[520px] mx-auto bg-bg-card border border-accent/15 rounded-2xl shadow-[0_-10px_40px_rgba(139,92,246,0.1)] p-5 relative">
         <button onClick={dismiss} className="absolute top-3 right-3 text-white/15 hover:text-white/40 transition p-1">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
