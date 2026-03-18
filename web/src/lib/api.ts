@@ -90,8 +90,10 @@ export const ordersApi = {
   create: (data: { items: { template_id: number; services?: number[] }[]; promo_code?: string }) =>
     api.post('/orders', data),
 
-  list: (page = 1) =>
-    api.get('/orders', { params: { page } }),
+  list: (params?: { page?: number; per_page?: number } | number) => {
+    const p = typeof params === 'number' ? { page: params } : params
+    return api.get('/orders', { params: p })
+  },
 
   show: (id: number) =>
     api.get(`/orders/${id}`),
