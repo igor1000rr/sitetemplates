@@ -2,23 +2,12 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import PricingCards from './PricingCards'
 
-const API_URL = process.env.API_URL || 'http://localhost:8000'
-
 export const metadata: Metadata = {
   title: 'Тарифы — Подписка на все шаблоны',
   description: 'Безлимитный доступ ко всем шаблонам сайтов от 990 ₽/мес. Скачивайте, используйте, зарабатывайте.',
 }
 
-async function getPlans() {
-  const res = await fetch(`${API_URL}/api/subscriptions/plans`, { next: { revalidate: 300 } })
-  if (!res.ok) return []
-  const data = await res.json()
-  return data.data || []
-}
-
-export default async function PricingPage() {
-  const plans = await getPlans()
-
+export default function PricingPage() {
   return (
     <main className="min-h-screen pt-[100px] pb-16">
       <div className="max-w-[1100px] mx-auto px-8">
@@ -33,8 +22,8 @@ export default async function PricingPage() {
           </p>
         </div>
 
-        {/* Plans */}
-        <PricingCards plans={plans} />
+        {/* Plans — fetches client-side */}
+        <PricingCards />
 
         {/* FAQ */}
         <div className="mt-20 max-w-[700px] mx-auto">

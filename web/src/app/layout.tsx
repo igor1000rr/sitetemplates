@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { Inter, Space_Grotesk } from 'next/font/google'
 import dynamic from 'next/dynamic'
 import './globals.css'
 import TopBar from '@/components/layout/TopBar'
@@ -17,21 +16,6 @@ const AiChatWidget = dynamic(() => import('@/components/shared/AiChatWidget'), {
 const CookieConsent = dynamic(() => import('@/components/shared/CookieConsent'), { ssr: false })
 const ScrollToTop = dynamic(() => import('@/components/shared/ScrollToTop'), { ssr: false })
 const EmailCapture = dynamic(() => import('@/components/shared/EmailCapture'), { ssr: false })
-
-// Self-hosted fonts — zero layout shift, no render-blocking CSS
-const inter = Inter({
-  subsets: ['cyrillic', 'latin'],
-  display: 'swap',
-  variable: '--font-inter',
-  weight: ['400', '500', '600', '700', '800', '900'],
-})
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-display',
-  weight: ['500', '600', '700'],
-})
 
 export const metadata: Metadata = {
   title: {
@@ -72,7 +56,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={`${inter.variable} ${spaceGrotesk.variable}`}>
+    <html lang="ru">
       <head>
         {/* Preconnect to external origins */}
         <link rel="preconnect" href="https://s3.timeweb.cloud" crossOrigin="anonymous" />

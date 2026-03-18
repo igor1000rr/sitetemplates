@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description: 'AI-платформа для запуска сайтов. 326+ шаблонов WordPress и Tilda. Готовый сайт за 5 минут.',
 }
 
+export const dynamic = 'force-dynamic'
+
 const API_URL = process.env.API_URL || 'http://localhost:8000'
 
 async function getFeaturedTemplates(): Promise<TemplateListItem[]> {

@@ -5,6 +5,8 @@ import CatalogFilters from '@/components/templates/CatalogFilters'
 import Breadcrumbs from '@/components/shared/Breadcrumbs'
 import { BreadcrumbSchema } from '@/components/seo/JsonLd'
 
+export const dynamic = 'force-dynamic'
+
 const API_URL = process.env.API_URL || 'http://localhost:8000'
 
 export const metadata: Metadata = {

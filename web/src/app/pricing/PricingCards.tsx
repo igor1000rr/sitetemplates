@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { subscriptionApi } from '@/lib/api'
 import { useAuth } from '@/stores/auth'
@@ -18,11 +18,20 @@ interface Plan {
   is_popular: boolean
 }
 
-export default function PricingCards({ plans }: { plans: Plan[] }) {
+export default function PricingCards() {
+  const [plans, setPlans] = useState<Plan[]>([])
+  const [plansLoading, setPlansLoading] = useState(true)
   const [annual, setAnnual] = useState(false)
   const [loading, setLoading] = useState<number | null>(null)
   const { isAuthenticated } = useAuth()
   const router = useRouter()
+
+  useEffect(() => {
+    subscriptionApi.plans()
+      .then(({ data }) => setPlans(data.data || data || []))
+      .catch(() => {})
+      .finally(() => setPlansLoading(false))
+  }, [])
 
   const subscribe = async (planId: number) => {
     if (!isAuthenticated) {
@@ -45,6 +54,24 @@ export default function PricingCards({ plans }: { plans: Plan[] }) {
 
   return (
     <div>
+      {plansLoading ? (
+        <div className="grid md:grid-cols-3 gap-5 max-w-[960px] mx-auto">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="p-6 rounded-2xl border border-white/[0.05] bg-bg-card animate-pulse">
+              <div className="h-5 w-24 bg-white/[0.05] rounded mb-2" />
+              <div className="h-3 w-40 bg-white/[0.03] rounded mb-6" />
+              <div className="h-10 w-32 bg-white/[0.05] rounded mb-6" />
+              <div className="h-10 w-full bg-white/[0.05] rounded mb-6" />
+              <div className="space-y-2">
+                {[1, 2, 3].map((j) => <div key={j} className="h-3 w-full bg-white/[0.03] rounded" />)}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : plans.length === 0 ? (
+        <p className="text-center text-white/20 py-12">Тарифные планы загружаются...</p>
+      ) : (
+      <>
       {/* Billing toggle */}
       <div className="flex items-center justify-center gap-4 mb-10">
         <span className={`text-sm transition ${!annual ? 'text-white' : 'text-white/30'}`}>Ежемесячно</span>
@@ -129,6 +156,8 @@ export default function PricingCards({ plans }: { plans: Plan[] }) {
           )
         })}
       </div>
+      </>
+      )}
     </div>
   )
 }

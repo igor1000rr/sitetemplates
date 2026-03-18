@@ -3,6 +3,8 @@ import type { Metadata } from 'next'
 import Breadcrumbs from '@/components/shared/Breadcrumbs'
 import { BreadcrumbSchema } from '@/components/seo/JsonLd'
 
+export const dynamic = 'force-dynamic'
+
 const API_URL = process.env.API_URL || 'http://localhost:8000'
 
 export const metadata: Metadata = {
@@ -11,16 +13,20 @@ export const metadata: Metadata = {
 }
 
 async function getPosts(params: Record<string, string> = {}) {
-  const sp = new URLSearchParams(params)
-  const res = await fetch(`${API_URL}/api/blog?${sp}`, { next: { revalidate: 60 } })
-  if (!res.ok) return { data: [], meta: {} }
-  return await res.json()
+  try {
+    const sp = new URLSearchParams(params)
+    const res = await fetch(`${API_URL}/api/blog?${sp}`, { cache: 'no-store' })
+    if (!res.ok) return { data: [], meta: {} }
+    return await res.json()
+  } catch { return { data: [], meta: {} } }
 }
 
 async function getCategories() {
-  const res = await fetch(`${API_URL}/api/blog/categories`, { next: { revalidate: 300 } })
-  if (!res.ok) return { data: [] }
-  return await res.json()
+  try {
+    const res = await fetch(`${API_URL}/api/blog/categories`, { cache: 'no-store' })
+    if (!res.ok) return { data: [] }
+    return await res.json()
+  } catch { return { data: [] } }
 }
 
 interface Props { searchParams: Record<string, string> }
