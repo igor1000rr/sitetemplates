@@ -75,7 +75,7 @@ export default function DeployModal({ templateId, templateTitle, onClose }: Prop
   }
 
   const inputCls = 'w-full px-3 py-2 bg-white/[0.03] border border-white/[0.06] rounded-lg text-white text-sm outline-none focus:border-accent/30 transition placeholder:text-white/15'
-  const st = deployment ? statusLabels[deployment.status] || {} : {}
+  const st: { color?: string; label?: string } = deployment ? statusLabels[deployment.status] || {} : {}
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

@@ -75,7 +75,7 @@ export default function CatalogFilters({ categories, platforms, current }: Props
                 }`}
               >
                 <span className="truncate">{c.name}</span>
-                {c.templates_count > 0 && (
+                {(c.templates_count ?? 0) > 0 && (
                   <span className="text-white/12 text-xs ml-1">{c.templates_count}</span>
                 )}
               </button>

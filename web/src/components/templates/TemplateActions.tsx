@@ -107,7 +107,7 @@ export default function TemplateActions({ templateId, templateTitle, templateSlu
         </button>
 
         <button
-          onClick={() => addCompare({ id: templateId, title: templateTitle, slug: templateSlug, preview_image: previewImage || null })}
+          onClick={() => addCompare({ id: templateId, title: templateTitle, slug: templateSlug, preview_image: previewImage || undefined })}
           className={`flex-1 py-2 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5 ${
             inCompare
               ? 'bg-accent/10 text-accent-pale border border-accent/15'

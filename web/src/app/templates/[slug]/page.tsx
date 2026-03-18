@@ -231,7 +231,7 @@ export default async function TemplatePage({ params }: Props) {
                     templateSlug={t.slug}
                     previewImage={t.images?.[0]?.path}
                   />
-                </div>}
+                </div>
 
                 {/* Features */}
                 <div className="mt-6 pt-5 border-t border-white/[0.05]">

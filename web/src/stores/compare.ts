@@ -5,6 +5,7 @@ import { create } from 'zustand'
 interface CompareItem {
   id: number
   title: string
+  slug?: string
   preview_image?: string
 }
 
