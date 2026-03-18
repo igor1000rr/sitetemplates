@@ -1,0 +1,49 @@
+# ═══ .github/workflows/deploy.yml ═══
+# Положить в корень репозитория: .github/workflows/deploy.yml
+#
+# Secrets (GitHub → Settings → Secrets):
+#   SSH_HOST      — IP сервера
+#   SSH_USER      — пользователь (root или deploy)
+#   SSH_KEY       — приватный SSH ключ
+#   REGISTRY      — Docker Registry (ghcr.io/username или registry.example.com)
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+env:
+  PROJECT_DIR: /opt/templatename
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ${{ env.PROJECT_DIR }}
+
+            # Pull latest code
+            git pull origin main 2>/dev/null || true
+
+            # Build & restart
+            docker compose -f docker-compose.prod.yml build
+            docker compose -f docker-compose.prod.yml up -d
+
+            # Migrate
+            docker compose -f docker-compose.prod.yml exec -T api php artisan migrate --force
+
+            # Cache
+            docker compose -f docker-compose.prod.yml exec -T api php artisan config:cache
+            docker compose -f docker-compose.prod.yml exec -T api php artisan route:cache
+            docker compose -f docker-compose.prod.yml exec -T api php artisan view:cache
+
+            echo "✅ Deployed!"

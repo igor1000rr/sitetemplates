@@ -1,0 +1,16 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#07070f"/>
+      <stop offset="100%" stop-color="#1a1a2e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="200" cy="150" r="200" fill="rgba(139,92,246,0.08)"/>
+  <circle cx="1000" cy="500" r="250" fill="rgba(139,92,246,0.05)"/>
+  <text x="100" y="250" font-family="system-ui, sans-serif" font-weight="800" font-size="64" fill="white">TemplateName</text>
+  <text x="100" y="320" font-family="system-ui, sans-serif" font-weight="400" font-size="28" fill="rgba(255,255,255,0.5)">AI-платформа для запуска сайтов</text>
+  <text x="100" y="380" font-family="system-ui, sans-serif" font-weight="400" font-size="22" fill="rgba(167,139,250,0.7)">326+ шаблонов WordPress и Tilda</text>
+  <rect x="100" y="440" width="180" height="50" rx="12" fill="rgba(139,92,246,0.9)"/>
+  <text x="130" y="473" font-family="system-ui, sans-serif" font-weight="700" font-size="18" fill="white">Выбрать шаблон</text>
+</svg>

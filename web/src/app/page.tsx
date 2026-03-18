@@ -1,0 +1,387 @@
+import type { Metadata } from 'next'
+import type { TemplateListItem, Category } from '@/types'
+import Image from 'next/image'
+import HeroSearch from '@/components/home/HeroSearch'
+
+export const metadata: Metadata = {
+  title: 'TemplateName — Шаблоны сайтов для бизнеса',
+  description: 'AI-платформа для запуска сайтов. 326+ шаблонов WordPress и Tilda. Готовый сайт за 5 минут.',
+}
+
+const API_URL = process.env.API_URL || 'http://localhost:8000'
+
+async function getFeaturedTemplates(): Promise<TemplateListItem[]> {
+  try {
+    const res = await fetch(`${API_URL}/api/templates/featured`, { next: { revalidate: 60 } })
+    const data = await res.json()
+    return data.data || []
+  } catch { return [] }
+}
+
+async function getCategories(): Promise<Category[]> {
+  try {
+    const res = await fetch(`${API_URL}/api/categories`, { next: { revalidate: 300 } })
+    return await res.json()
+  } catch { return [] }
+}
+
+async function getNewArrivals(): Promise<TemplateListItem[]> {
+  try {
+    const res = await fetch(`${API_URL}/api/templates?sort=newest&per_page=4`, { next: { revalidate: 300 } })
+    const data = await res.json()
+    return data.data || []
+  } catch { return [] }
+}
+
+async function getTopReviews(): Promise<{ name: string; text: string; rating: number; template_title?: string }[]> {
+  try {
+    const res = await fetch(`${API_URL}/api/reviews?sort=best&per_page=3&status=approved`, { next: { revalidate: 600 } })
+    const data = await res.json()
+    return data.data || []
+  } catch { return [] }
+}
+
+export default async function HomePage() {
+  const [templates, categories, newArrivals, reviews] = await Promise.all([
+    getFeaturedTemplates(), getCategories(), getNewArrivals(), getTopReviews(),
+  ])
+
+  return (
+    <main className="min-h-screen">
+      {/* Hero */}
+      <section className="pt-[65px] pb-9 text-center">
+        <div className="max-w-[780px] mx-auto px-8">
+          <p className="text-accent-light text-[13px] font-semibold tracking-[1px] uppercase mb-5">
+            AI-платформа для запуска сайтов
+          </p>
+          <h1 className="font-display text-[clamp(36px,5.5vw,68px)] font-bold leading-[1.05] mb-5 tracking-[-3px]">
+            Сайт для бизнеса<br />
+            <span className="text-accent-pale">за 3 минуты</span>
+          </h1>
+          <p className="text-white/40 text-[17px] leading-relaxed max-w-[500px] mx-auto mb-5">
+            AI подберёт дизайн, напишет тексты и настроит SEO.
+            <br />Вам останется нажать «Опубликовать».
+          </p>
+
+          <HeroSearch />
+
+          {/* Trust badges */}
+          <div className="flex flex-wrap gap-4 justify-center mt-6">
+            {['Без кода', 'Русская админка', 'Поддержка 24/7', 'WordPress + Tilda'].map((t) => (
+              <span key={t} className="text-white/20 text-[12px] flex items-center gap-1.5">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                {t}
+              </span>
+            ))}
+          </div>
+
+          {/* AI-подбор кнопка */}
+          <div className="mt-6 flex justify-center">
+            <a href="/ai-match"
+              className="inline-flex items-center gap-2 bg-white/[0.03] border border-accent/15 text-accent-pale/80 px-5 py-2 rounded-full text-[12px] font-medium hover:bg-accent/[0.06] transition">
+              <span>✨</span> Не знаете что выбрать? AI подберёт за 30 секунд
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* AI Features */}
+      <section className="max-w-[1000px] mx-auto px-8 mb-14">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {[
+            { icon: '🤖', title: 'AI подбирает шаблон', desc: 'Расскажите о бизнесе — AI проанализирует 300+ шаблонов и найдёт идеальный за 30 секунд' },
+            { icon: '⚡', title: 'Установка в 1 клик', desc: 'Укажите FTP-доступы — и шаблон автоматически установится на ваш хостинг. Без кода.' },
+            { icon: '💬', title: 'AI-чат помощник', desc: 'Задайте любой вопрос в чат — AI ответит, поможет с выбором или настройкой шаблона' },
+          ].map((f) => (
+            <div key={f.title} className="bg-bg-card rounded-2xl border border-white/[0.05] p-6 hover:border-accent/10 transition">
+              <div className="text-2xl mb-3">{f.icon}</div>
+              <h3 className="font-bold text-sm mb-2">{f.title}</h3>
+              <p className="text-white/25 text-xs leading-relaxed">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* How it works — for newbies */}
+      <section className="max-w-[1000px] mx-auto px-8 mb-16">
+        <div className="text-center mb-8">
+          <p className="text-accent-light text-[11px] font-bold tracking-[2px] uppercase mb-2">Просто</p>
+          <h2 className="font-display text-[28px] font-bold tracking-tight">Как это работает</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[
+            { step: '01', title: 'Выберите шаблон', desc: 'Используйте AI-подбор или найдите в каталоге. Посмотрите Live Preview.' },
+            { step: '02', title: 'Оплатите', desc: 'Карта, СБП или ЮMoney. Или оформите подписку для безлимита.' },
+            { step: '03', title: 'Скачайте', desc: 'ZIP-архив с шаблоном, инструкцией и исходниками в личном кабинете.' },
+            { step: '04', title: 'Запустите', desc: 'Установите через One-Click Deploy или вручную на любой хостинг.' },
+          ].map((s) => (
+            <div key={s.step} className="relative p-5 bg-bg-card rounded-xl border border-white/[0.05]">
+              <div className="text-accent/20 text-[36px] font-extrabold leading-none mb-2">{s.step}</div>
+              <h3 className="font-bold text-sm mb-1.5">{s.title}</h3>
+              <p className="text-white/25 text-xs leading-relaxed">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Niches */}
+      <section className="max-w-[1300px] mx-auto px-8 mb-12">
+        <div className="flex gap-2.5 overflow-x-auto pb-2">
+          {categories.map((cat) => (
+            <a
+              key={cat.id}
+              href={`/templates?category=${cat.slug}`}
+              className="min-w-[155px] h-[100px] rounded-[14px] p-4 bg-bg-surface border border-white/[0.05] flex flex-col justify-between hover:border-accent/20 transition shrink-0"
+            >
+              <span className="text-accent-light text-lg">●</span>
+              <span className="text-[12.5px] font-semibold text-white/65">{cat.name}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="max-w-[1300px] mx-auto px-8 mb-14">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {[
+            { n: '326+', l: 'Шаблонов' }, { n: '12.4K', l: 'Клиентов' },
+            { n: '4.9', l: 'Средняя оценка' }, { n: '3 мин', l: 'Время запуска' },
+          ].map((s) => (
+            <div key={s.l} className="text-center">
+              <div className="text-accent-pale text-[34px] font-extrabold tracking-tight leading-none mb-1">{s.n}</div>
+              <div className="text-white/25 text-[12px] uppercase tracking-[0.5px]">{s.l}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Templates */}
+      <section className="max-w-[1300px] mx-auto px-8 pb-16">
+        <div className="flex justify-between items-end mb-8">
+          <div>
+            <p className="text-accent-light text-[11px] font-bold tracking-[2px] uppercase mb-2">Каталог</p>
+            <h2 className="font-display text-[28px] font-bold tracking-tight">Популярные шаблоны</h2>
+          </div>
+          <a href="/templates" className="text-white/30 text-sm hover:text-accent-light transition">Все шаблоны →</a>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 animate-stagger">
+          {templates.map((t) => (
+            <a
+              key={t.id}
+              href={`/templates/${t.slug}`}
+              className="group bg-bg-card rounded-[20px] overflow-hidden border border-white/[0.05] hover:border-accent/15 transition-all duration-400 hover:-translate-y-1.5 hover:shadow-[0_20px_50px_rgba(0,0,0,0.45)]"
+            >
+              <div className="relative aspect-[16/10] bg-bg-surface overflow-hidden">
+                {t.image && <Image src={t.image} alt={t.title} width={640} height={400} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />}
+                {t.discount_percent && (
+                  <div className="absolute top-3 right-3 bg-accent/90 text-white px-3 py-1 rounded-lg text-xs font-bold">-{t.discount_percent}%</div>
+                )}
+                {t.demo_url && (
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <span
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.location.href = `/preview/${t.slug}` }}
+                      className="flex items-center gap-2 bg-white/15 backdrop-blur-md text-white px-5 py-2.5 rounded-xl text-[13px] font-semibold hover:bg-white/25 transition border border-white/10 cursor-pointer"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                      </svg>
+                      Live Preview
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="p-5 pb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="bg-accent/[0.08] text-accent-light px-3 py-1 rounded-md text-[11px] font-semibold">{t.platform.name}</span>
+                  <span className="text-white/25 text-[11px]">{t.template_type}</span>
+                </div>
+                <h3 className="text-white text-[16px] font-bold leading-snug mb-3 tracking-tight">{t.title}</h3>
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  {t.features.slice(0, 3).map((f) => (
+                    <span key={f} className="bg-white/[0.03] text-white/30 px-2.5 py-1 rounded-md text-[11px]">{f}</span>
+                  ))}
+                </div>
+                <div className="flex items-baseline justify-between">
+                  {t.old_price_rub && <span className="text-white/20 text-sm line-through">{t.old_price_rub.toLocaleString('ru-RU')} ₽</span>}
+                  <span className="text-accent-pale text-[26px] font-extrabold tracking-tight">
+                    {t.price_rub.toLocaleString('ru-RU')}<span className="text-[15px] font-medium ml-0.5">₽</span>
+                  </span>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div className="text-center mt-12">
+          <a href="/templates" className="inline-flex items-center gap-2 bg-accent text-white px-11 py-3.5 rounded-xl text-sm font-bold hover:bg-accent-dark transition">
+            Все 326 шаблонов →
+          </a>
+        </div>
+      </section>
+
+      {/* New Arrivals */}
+      {newArrivals.length > 0 && (
+        <section className="max-w-[1300px] mx-auto px-8 pb-16">
+          <div className="flex justify-between items-end mb-8">
+            <div>
+              <p className="text-green-400/80 text-[11px] font-bold tracking-[2px] uppercase mb-2">Новинки</p>
+              <h2 className="font-display text-[28px] font-bold tracking-tight">Только что добавлены</h2>
+            </div>
+            <a href="/templates?sort=newest" className="text-white/30 text-sm hover:text-accent-light transition">Все новинки →</a>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            {newArrivals.map((t) => (
+              <a key={t.id} href={`/templates/${t.slug}`}
+                className="group bg-bg-card rounded-xl overflow-hidden border border-white/[0.05] hover:border-green-500/15 transition-all duration-300 hover:-translate-y-1">
+                <div className="relative aspect-[16/10] bg-bg-surface overflow-hidden">
+                  {t.image && <Image src={t.image} alt={t.title} width={480} height={300} sizes="(max-width: 768px) 100vw, 25vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />}
+                  <div className="absolute top-3 left-3 bg-green-500/80 text-white px-2.5 py-0.5 rounded-md text-[10px] font-bold backdrop-blur-sm">
+                    NEW
+                  </div>
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="bg-accent/[0.08] text-accent-light px-2 py-0.5 rounded text-[10px] font-semibold">{t.platform?.name}</span>
+                    <span className="text-white/20 text-[10px]">{t.template_type}</span>
+                  </div>
+                  <h3 className="text-sm font-semibold leading-snug mb-2 line-clamp-1 group-hover:text-accent-pale transition">{t.title}</h3>
+                  <span className="text-accent-pale text-lg font-bold">{t.price_rub?.toLocaleString('ru-RU')} ₽</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Why Us */}
+      <section className="max-w-[1100px] mx-auto px-8 pb-16">
+        <div className="text-center mb-10">
+          <p className="text-accent-light text-[11px] font-bold tracking-[2px] uppercase mb-2">Преимущества</p>
+          <h2 className="font-display text-[34px] font-bold tracking-tight">
+            Не просто шаблоны — <span className="text-accent-pale">AI-платформа</span>
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[
+            { t: 'AI-подбор шаблона', d: 'Опишите бизнес — AI подберёт идеальный шаблон и сгенерирует контент', i: '🤖' },
+            { t: 'Live Preview', d: 'Смотрите как будет выглядеть ваш сайт до покупки в реальном времени', i: '👁️' },
+            { t: 'Без кода', d: 'Запуск сайта без единой строчки кода. Всё через визуальный редактор', i: '⚡' },
+            { t: 'Русская админка', d: 'Полностью русифицированная панель управления. Поддержка на русском', i: '🇷🇺' },
+            { t: 'SEO из коробки', d: 'Мета-теги, микроразметка, sitemap, robots.txt — всё уже настроено', i: '📈' },
+            { t: 'Поддержка 24/7', d: 'Telegram-бот, база знаний и живые операторы круглосуточно', i: '💬' },
+          ].map((f) => (
+            <div key={f.t} className="bg-bg-card rounded-2xl border border-white/[0.05] p-6 hover:border-accent/10 transition">
+              <div className="text-2xl mb-4">{f.i}</div>
+              <h3 className="text-[15px] font-bold tracking-tight mb-2">{f.t}</h3>
+              <p className="text-white/30 text-[13px] leading-relaxed">{f.d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Reviews */}
+      <section className="max-w-[1100px] mx-auto px-8 pb-16">
+        <div className="text-center mb-10">
+          <p className="text-accent-light text-[11px] font-bold tracking-[2px] uppercase mb-2">Отзывы</p>
+          <h2 className="font-display text-[28px] font-bold tracking-tight mb-2">Что говорят клиенты</h2>
+          <p className="text-white/25 text-[13px]">12 400+ пользователей · Средняя оценка 4.9</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {(reviews.length > 0 ? reviews : [
+            { name: 'Алексей М.', text: 'Запустил сайт клиники за вечер. Раньше платил агентству 180 000₽, а тут за 4 990₽ получил то же самое.', rating: 5, template_title: 'Стоматология' },
+            { name: 'Мария К.', text: 'AI подобрал идеальный шаблон и сгенерировал все тексты для услуг. Экономия минимум 2 недели работы.', rating: 5, template_title: 'Салон красоты' },
+            { name: 'Дмитрий В.', text: 'Квиз-шаблон начал генерить заявки с первого дня. Уже окупил покупку в 10 раз за месяц.', rating: 5, template_title: 'Строительство' },
+          ]).map((r: any, i: number) => (
+            <div key={i} className="bg-bg-card rounded-2xl border border-white/[0.05] p-6">
+              <div className="flex gap-0.5 mb-4">
+                {[1,2,3,4,5].map((s) => (
+                  <svg key={s} width="14" height="14" viewBox="0 0 24 24" fill={s <= r.rating ? '#a78bfa' : 'rgba(255,255,255,0.1)'}>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>
+                  </svg>
+                ))}
+              </div>
+              <p className="text-white/40 text-sm leading-relaxed mb-4">{r.text}</p>
+              <div>
+                <div className="text-white/70 text-sm font-semibold">{r.name || r.user_name}</div>
+                {r.template_title && <div className="text-white/20 text-xs">о «{r.template_title}»</div>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section className="max-w-[1000px] mx-auto px-8 pb-16">
+        <div className="text-center mb-10">
+          <p className="text-accent-light text-[11px] font-bold tracking-[2px] uppercase mb-2">Тарифы</p>
+          <h2 className="font-display text-[36px] font-bold tracking-tight mb-2">Окупается с первого клиента</h2>
+          <p className="text-white/25 text-[14px]">Сайт от агентства — от 150 000 ₽. У нас — от 990 ₽/мес</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {[
+            { name: 'Стартовый', price: '990', desc: '5 скачиваний в месяц', features: ['5 шаблонов/мес', 'Все шаблоны каталога', 'Обновления шаблонов', 'Email-поддержка'] },
+            { name: 'Про', price: '1 990', desc: 'Безлимитный доступ', features: ['Безлимит скачиваний', 'Все шаблоны каталога', 'PSD/Figma исходники', 'Приоритетная поддержка', 'Обновления шаблонов'], popular: true },
+            { name: 'Агентство', price: '4 990', desc: 'Для студий и фрилансеров', features: ['Безлимит скачиваний', 'Расширенная лицензия', 'White Label', 'PSD/Figma исходники', 'Личный менеджер'] },
+          ].map((p) => (
+            <div key={p.name} className={`rounded-2xl border p-6 ${p.popular ? 'bg-accent/[0.04] border-accent/20' : 'bg-bg-card border-white/[0.05]'}`}>
+              {p.popular && <div className="text-accent-light text-[10px] font-bold uppercase tracking-wider mb-3">Популярный</div>}
+              <h3 className="text-lg font-bold mb-1">{p.name}</h3>
+              <p className="text-white/25 text-xs mb-4">{p.desc}</p>
+              <div className="mb-5">
+                <span className={`text-[42px] font-extrabold tracking-tight ${p.popular ? 'text-accent-pale' : 'text-white'}`}>
+                  {p.price}
+                </span>
+                <span className="text-white/25 text-sm ml-1">₽/мес</span>
+              </div>
+              <div className="space-y-2.5 mb-6">
+                {p.features.map((f) => (
+                  <div key={f} className="flex items-center gap-2 text-white/40 text-sm">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    {f}
+                  </div>
+                ))}
+              </div>
+              <a href="/pricing" className={`block w-full py-3 rounded-xl text-sm font-bold transition text-center ${p.popular ? 'bg-accent hover:bg-accent-dark text-white' : 'bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white/80'}`}>
+                Выбрать
+              </a>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-[800px] mx-auto px-8 pb-16">
+        <div className="bg-bg-card rounded-2xl border border-white/[0.06] p-10 text-center">
+          <h3 className="font-display text-[30px] font-bold tracking-tight mb-3">Хватит откладывать</h3>
+          <p className="text-white/30 text-sm mb-6 max-w-md mx-auto">
+            Пока вы думаете — ваши конкуренты уже запустили сайт и получают клиентов. AI подберёт шаблон за 30 секунд.
+          </p>
+          <div className="flex gap-3 justify-center flex-wrap">
+            <a href="/ai-match" className="inline-flex bg-accent text-white px-10 py-3.5 rounded-xl text-sm font-bold hover:bg-accent-dark transition">
+              ✨ AI подберёт шаблон →
+            </a>
+            <a href="/templates" className="inline-flex bg-white/[0.04] border border-white/[0.06] text-white/50 px-6 py-3.5 rounded-xl text-sm font-semibold hover:text-white/80 transition">
+              Весь каталог
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Authors CTA */}
+      <section className="max-w-[800px] mx-auto px-8 pb-16">
+        <div className="bg-bg-surface rounded-2xl border border-white/[0.04] p-8 flex flex-wrap md:flex-nowrap items-center gap-6">
+          <div className="flex-1">
+            <h3 className="font-display text-[22px] font-bold tracking-tight mb-2">
+              Вы разработчик? <span className="text-accent-pale">Зарабатывайте с нами</span>
+            </h3>
+            <p className="text-white/25 text-sm">Загружайте шаблоны, получайте 70% с каждой продажи. Без ограничений.</p>
+          </div>
+          <a href="/author/register" className="bg-white/[0.04] border border-white/[0.06] text-white/50 px-6 py-2.5 rounded-xl text-sm font-semibold hover:text-white/80 transition shrink-0">
+            Стать автором
+          </a>
+        </div>
+      </section>
+    </main>
+  )
+}

@@ -1,0 +1,38 @@
+# Dependencies
+api/vendor/
+web/node_modules/
+web/.next/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+api/storage/logs/*
+!api/storage/logs/.gitkeep
+
+# Cache
+api/bootstrap/cache/*.php
+api/storage/framework/cache/*
+api/storage/framework/sessions/*
+api/storage/framework/views/*
+
+# Build
+web/.next/
+web/out/
+
+# Docker volumes
+postgres_data/
+redis_data/
+
+# SSL
+deploy/ssl/
