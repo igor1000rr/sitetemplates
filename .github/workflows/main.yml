@@ -4,9 +4,15 @@ on:
   push:
     branches: [main]
 
+# Отменяет предыдущие запуски при быстрых пушах
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
@@ -14,9 +20,51 @@ jobs:
           host: 147.45.155.40
           username: root
           key: ${{ secrets.SSH_KEY }}
+          command_timeout: 12m
           script: |
+            set -e
             cd /opt/sitetemplates
+
+            echo ">>> Pull"
             git pull origin main
+
+            echo ">>> Build"
             docker compose build --no-cache
+
+            echo ">>> Deploy"
             docker compose up -d
+
+            echo ">>> Migrate"
             docker compose exec -T api php artisan migrate --force
+
+            echo ">>> Health check (ждём 15 сек)"
+            sleep 15
+
+            # Проверка API
+            API_STATUS=$(docker compose exec -T api curl -sf http://localhost:8000/api/health | grep -o '"status":"[^"]*"' || echo "FAIL")
+            echo "API: $API_STATUS"
+            if echo "$API_STATUS" | grep -q "FAIL"; then
+              echo "❌ API health check failed!"
+              docker compose logs api --tail=20
+              exit 1
+            fi
+
+            # Проверка Web
+            WEB_STATUS=$(docker compose exec -T web curl -sf http://localhost:3000/ -o /dev/null -w "%{http_code}" || echo "000")
+            echo "Web: HTTP $WEB_STATUS"
+            if [ "$WEB_STATUS" != "200" ]; then
+              echo "❌ Web health check failed!"
+              docker compose logs web --tail=20
+              exit 1
+            fi
+
+            # Все контейнеры running
+            RUNNING=$(docker compose ps --format json | grep -c '"running"' || echo "0")
+            echo "Running containers: $RUNNING/5"
+            if [ "$RUNNING" -lt 4 ]; then
+              echo "❌ Not all containers are running!"
+              docker compose ps
+              exit 1
+            fi
+
+            echo "✅ Deploy successful at $(date)"
