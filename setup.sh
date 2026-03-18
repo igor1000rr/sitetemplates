@@ -112,9 +112,8 @@ fi
 echo ""
 echo ">>> [7/8] Подготовка Docker Compose..."
 
-# Копируем compose в корень проекта (он ссылается на ./api и ./web)
+# Копируем compose в корень проекта
 cp deploy/docker-compose.prod.yml docker-compose.yml
-cp deploy/nginx.conf nginx.conf
 
 # Создаём директорию для SSL
 mkdir -p deploy/ssl
