@@ -1,0 +1,22 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 147.45.155.40
+          username: root
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /opt/sitetemplates
+            git pull origin main
+            docker compose build --no-cache
+            docker compose up -d
+            docker compose exec -T api php artisan migrate --force
