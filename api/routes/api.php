@@ -220,30 +220,3 @@ Route::get('/services', [\App\Http\Controllers\ServiceController::class, 'index'
 
 // Custom development requests
 Route::post('/custom-requests', [\App\Http\Controllers\CustomRequestController::class, 'store'])->middleware('throttle:3,1');
-
-// Health check (for Docker, load balancers, monitoring)
-Route::get('/health', function () {
-    try {
-        \Illuminate\Support\Facades\DB::connection()->getPdo();
-        $dbOk = true;
-    } catch (\Throwable $e) {
-        $dbOk = false;
-    }
-
-    $cacheOk = true;
-    try {
-        \Illuminate\Support\Facades\Cache::store()->put('health_check', true, 10);
-        $cacheOk = \Illuminate\Support\Facades\Cache::store()->get('health_check') === true;
-    } catch (\Throwable $e) {
-        $cacheOk = false;
-    }
-
-    $status = $dbOk && $cacheOk ? 200 : 503;
-
-    return response()->json([
-        'status' => $status === 200 ? 'ok' : 'degraded',
-        'db' => $dbOk,
-        'cache' => $cacheOk,
-        'timestamp' => now()->toIso8601String(),
-    ], $status);
-});
