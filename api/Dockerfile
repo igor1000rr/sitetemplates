@@ -26,10 +26,14 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 
 # Copy app
 COPY . .
-RUN composer dump-autoload --optimize
 
-# Create required directories
+# Create required directories BEFORE autoload (artisan needs cache path)
 RUN mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
+
+# Dummy .env for artisan package:discover during build
+RUN echo "APP_KEY=base64:dGVtcGxhdGVuYW1lLWJ1aWxkLWtleS0xMjM0NTY3OA==" > .env
+
+RUN composer dump-autoload --optimize
 
 # Config files
 COPY docker/php.ini /usr/local/etc/php/conf.d/99-app.ini
