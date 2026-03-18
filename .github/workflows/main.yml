@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
 
-# Отменяет предыдущие запуски при быстрых пушах
 concurrency:
   group: deploy
   cancel-in-progress: true
@@ -28,6 +27,9 @@ jobs:
             echo ">>> Pull"
             git pull origin main
 
+            echo ">>> Sync compose"
+            cp deploy/docker-compose.prod.yml docker-compose.yml
+
             echo ">>> Build"
             docker compose build --no-cache
 
@@ -37,32 +39,29 @@ jobs:
             echo ">>> Migrate"
             docker compose exec -T api php artisan migrate --force
 
-            echo ">>> Health check (ждём 15 сек)"
-            sleep 15
+            echo ">>> Health check (ждём 20 сек)"
+            sleep 20
 
-            # Проверка API
-            API_STATUS=$(docker compose exec -T api curl -sf http://localhost:8000/api/health | grep -o '"status":"[^"]*"' || echo "FAIL")
-            echo "API: $API_STATUS"
-            if echo "$API_STATUS" | grep -q "FAIL"; then
-              echo "❌ API health check failed!"
-              docker compose logs api --tail=20
+            if docker compose exec -T api curl -sf http://localhost:8000/api/health > /dev/null 2>&1; then
+              echo "✅ API OK"
+            else
+              echo "❌ API failed"
+              docker compose logs api --tail=10
               exit 1
             fi
 
-            # Проверка Web
-            WEB_STATUS=$(docker compose exec -T web curl -sf http://localhost:3000/ -o /dev/null -w "%{http_code}" || echo "000")
-            echo "Web: HTTP $WEB_STATUS"
-            if [ "$WEB_STATUS" != "200" ]; then
-              echo "❌ Web health check failed!"
-              docker compose logs web --tail=20
+            if docker compose exec -T web curl -sf http://localhost:3000/ > /dev/null 2>&1; then
+              echo "✅ Web OK"
+            else
+              echo "❌ Web failed"
+              docker compose logs web --tail=10
               exit 1
             fi
 
-            # Все контейнеры running
             RUNNING=$(docker compose ps --format json | grep -c '"running"' || echo "0")
-            echo "Running containers: $RUNNING/5"
+            echo "Running containers: $RUNNING"
             if [ "$RUNNING" -lt 4 ]; then
-              echo "❌ Not all containers are running!"
+              echo "❌ Not all containers running"
               docker compose ps
               exit 1
             fi
