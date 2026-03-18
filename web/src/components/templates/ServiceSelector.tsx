@@ -19,12 +19,12 @@ const categoryLabels: Record<string, string> = {
 }
 
 const categoryIcons: Record<string, string> = {
-  installation: '\U0001f527',
-  seo: '\U0001f50d',
-  content: '\u270d\ufe0f',
-  analytics: '\U0001f4ca',
-  support: '\U0001f6e1\ufe0f',
-  other: '\u2699\ufe0f',
+  installation: '🔧',
+  seo: '🔍',
+  content: '✍️',
+  analytics: '📊',
+  support: '🛡️',
+  other: '⚙️',
 }
 
 export default function ServiceSelector({ templateId }: Props) {

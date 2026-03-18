@@ -137,7 +137,11 @@ export default async function HomePage() {
               href={`/templates?category=${cat.slug}`}
               className="min-w-[155px] h-[100px] rounded-[14px] p-4 bg-bg-surface border border-white/[0.05] flex flex-col justify-between hover:border-accent/20 transition shrink-0"
             >
-              <span className="text-accent-light text-lg">●</span>
+              {cat.icon ? (
+                <span className="text-lg" dangerouslySetInnerHTML={{ __html: cat.icon }} />
+              ) : (
+                <span className="text-accent-light text-lg">📁</span>
+              )}
               <span className="text-[12.5px] font-semibold text-white/65">{cat.name}</span>
             </a>
           ))}
