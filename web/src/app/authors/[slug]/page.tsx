@@ -7,9 +7,12 @@ const API_URL = process.env.API_URL || 'http://localhost:8000'
 interface Props { params: { slug: string } }
 
 async function getAuthor(slug: string) {
-  const res = await fetch(`${API_URL}/api/authors/${slug}`, { next: { revalidate: 60 } })
-  if (!res.ok) return null
-  return await res.json()
+  try {
+    const res = await fetch(`${API_URL}/api/authors/${slug}`, { cache: 'no-store' })
+    if (!res.ok) return null
+    const data = await res.json()
+    return data.data || data || null
+  } catch { return null }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

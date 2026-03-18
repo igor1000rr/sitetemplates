@@ -14,7 +14,7 @@ const API_URL = process.env.API_URL || 'http://localhost:8000'
 
 async function getFeaturedTemplates(): Promise<TemplateListItem[]> {
   try {
-    const res = await fetch(`${API_URL}/api/templates/featured`, { next: { revalidate: 60 } })
+    const res = await fetch(`${API_URL}/api/templates/featured`, { cache: 'no-store' })
     const data = await res.json()
     return data.data || []
   } catch { return [] }
@@ -22,14 +22,16 @@ async function getFeaturedTemplates(): Promise<TemplateListItem[]> {
 
 async function getCategories(): Promise<Category[]> {
   try {
-    const res = await fetch(`${API_URL}/api/categories`, { next: { revalidate: 300 } })
-    return await res.json()
+    const res = await fetch(`${API_URL}/api/categories`, { cache: 'no-store' })
+    if (!res.ok) return []
+    const data = await res.json()
+    return Array.isArray(data) ? data : (data.data || [])
   } catch { return [] }
 }
 
 async function getNewArrivals(): Promise<TemplateListItem[]> {
   try {
-    const res = await fetch(`${API_URL}/api/templates?sort=newest&per_page=4`, { next: { revalidate: 300 } })
+    const res = await fetch(`${API_URL}/api/templates?sort=newest&per_page=4`, { cache: 'no-store' })
     const data = await res.json()
     return data.data || []
   } catch { return [] }
@@ -37,7 +39,7 @@ async function getNewArrivals(): Promise<TemplateListItem[]> {
 
 async function getTopReviews(): Promise<{ name: string; text: string; rating: number; template_title?: string }[]> {
   try {
-    const res = await fetch(`${API_URL}/api/reviews?sort=best&per_page=3&status=approved`, { next: { revalidate: 600 } })
+    const res = await fetch(`${API_URL}/api/reviews?sort=best&per_page=3&status=approved`, { cache: 'no-store' })
     const data = await res.json()
     return data.data || []
   } catch { return [] }

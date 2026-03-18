@@ -17,7 +17,8 @@ async function getPosts(params: Record<string, string> = {}) {
     const sp = new URLSearchParams(params)
     const res = await fetch(`${API_URL}/api/blog?${sp}`, { cache: 'no-store' })
     if (!res.ok) return { data: [], meta: {} }
-    return await res.json()
+    const json = await res.json()
+    return { data: json.data || [], meta: json.meta || {} }
   } catch { return { data: [], meta: {} } }
 }
 
@@ -25,7 +26,8 @@ async function getCategories() {
   try {
     const res = await fetch(`${API_URL}/api/blog/categories`, { cache: 'no-store' })
     if (!res.ok) return { data: [] }
-    return await res.json()
+    const json = await res.json()
+    return { data: Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []) }
   } catch { return { data: [] } }
 }
 

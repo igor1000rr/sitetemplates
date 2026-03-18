@@ -22,22 +22,26 @@ async function getTemplates(params: Record<string, string | undefined>) {
   const sp = new URLSearchParams()
   Object.entries(params).forEach(([k, v]) => { if (v) sp.set(k, v) })
   try {
-    const res = await fetch(`${API_URL}/api/templates?${sp}`, { next: { revalidate: 30 } })
-    return await res.json()
+    const res = await fetch(`${API_URL}/api/templates?${sp}`, { cache: 'no-store' })
+    if (!res.ok) return { data: [], meta: {} }
+    const json = await res.json()
+    return { data: json.data || [], meta: json.meta || {} }
   } catch { return { data: [], meta: {} } }
 }
 
 async function getCategories(): Promise<Category[]> {
   try {
-    const res = await fetch(`${API_URL}/api/categories`, { next: { revalidate: 300 } })
-    return await res.json()
+    const res = await fetch(`${API_URL}/api/categories`, { cache: 'no-store' })
+    const d = await res.json()
+    return Array.isArray(d) ? d : (d.data || [])
   } catch { return [] }
 }
 
 async function getPlatforms(): Promise<Platform[]> {
   try {
-    const res = await fetch(`${API_URL}/api/platforms`, { next: { revalidate: 300 } })
-    return await res.json()
+    const res = await fetch(`${API_URL}/api/platforms`, { cache: 'no-store' })
+    const d = await res.json()
+    return Array.isArray(d) ? d : (d.data || [])
   } catch { return [] }
 }
 
