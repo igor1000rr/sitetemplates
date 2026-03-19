@@ -34,7 +34,7 @@ export default function AuthorEditTemplate() {
       setCategories(cRes.data.data || cRes.data || [])
       setPlatforms(pRes.data.data || pRes.data || [])
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }, [id])
 
   const handleFileUpload = async (file: File, type: 'zip' | 'image') => {

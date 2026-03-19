@@ -17,7 +17,7 @@ export default function AccountSubscription() {
   const [cancelling, setCancelling] = useState(false)
 
   useEffect(() => {
-    subscriptionApi.my().then(({ data }) => { setSub(data.subscription); setLoading(false) })
+    subscriptionApi.my().then(({ data }) => { setSub(data.subscription); setLoading(false) }).catch(() => setLoading(false))
   }, [])
 
   const cancelSub = async () => {

@@ -16,7 +16,7 @@ export default function AdminNewPost() {
   })
 
   useEffect(() => {
-    adminApi.postCategories().then(({ data }) => setCategories(data.data || []))
+    adminApi.postCategories().then(({ data }) => setCategories(data.data || [])).catch(() => {})
   }, [])
 
   const save = async (status?: string) => {

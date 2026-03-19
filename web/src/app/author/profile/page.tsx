@@ -10,7 +10,7 @@ export default function AuthorProfile() {
   const [message, setMessage] = useState('')
 
   useEffect(() => {
-    authorApi.profile().then(({ data }) => { setForm(data.profile); setLoading(false) })
+    authorApi.profile().then(({ data }) => { setForm(data.profile); setLoading(false) }).catch(() => setLoading(false))
   }, [])
 
   const save = async () => {

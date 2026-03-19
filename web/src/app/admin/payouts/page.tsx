@@ -23,7 +23,7 @@ export default function AdminPayouts() {
       setPendingCount(data.pending_count)
       setPendingTotal(data.pending_total_rub)
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }
 
   useEffect(load, [filter])

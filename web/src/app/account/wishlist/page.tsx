@@ -11,7 +11,7 @@ export default function AccountWishlist() {
 
   useEffect(() => {
     wishlistApi.list()
-      .then(({ data }) => setTemplates(data.data || []))
+      .then(({ data }) => setTemplates(data.data || [])).catch(() => {}).finally(() => setLoading(false))
       .finally(() => setLoading(false))
   }, [])
 

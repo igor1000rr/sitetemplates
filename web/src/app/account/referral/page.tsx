@@ -15,7 +15,7 @@ export default function AccountReferral() {
         setStats(s.data)
         setRewards(r.data.data || [])
         setLoading(false)
-      })
+      }).catch(() => setLoading(false))
   }, [])
 
   const generateCode = async () => {

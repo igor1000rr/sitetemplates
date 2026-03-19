@@ -19,8 +19,8 @@ export default function AuthorNewTemplate() {
   })
 
   useEffect(() => {
-    catalogApi.categories().then(({ data }) => setCategories(data.data || data || []))
-    catalogApi.platforms().then(({ data }) => setPlatforms(data.data || data || []))
+    catalogApi.categories().then(({ data }) => setCategories(data.data || data || [])).catch(() => {})
+    catalogApi.platforms().then(({ data }) => setPlatforms(data.data || data || [])).catch(() => {})
   }, [])
 
   const handleFileUpload = async (file: File, type: 'zip' | 'image') => {

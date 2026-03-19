@@ -16,7 +16,7 @@ export default function AuthorTemplates() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    authorApi.templates().then(({ data }) => { setTemplates(data.data || []); setLoading(false) })
+    authorApi.templates().then(({ data }) => { setTemplates(data.data || []); setLoading(false) }).catch(() => setLoading(false))
   }, [])
 
   if (loading) return <div className="animate-pulse text-white/20">Загрузка...</div>

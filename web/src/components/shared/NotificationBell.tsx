@@ -36,7 +36,7 @@ export default function NotificationBell() {
     if (!isAuthenticated) return
     const fetch = () => {
       notificationApi.unreadCount()
-        .then(({ data }) => setUnread(data.count || 0))
+        .then(({ data }) => setUnread(data.count || 0)).catch(() => {})
         .catch(() => {})
     }
     fetch()

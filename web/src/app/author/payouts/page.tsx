@@ -24,7 +24,7 @@ export default function AuthorPayouts() {
         setPayouts(pRes.data.data || [])
         setBalance(dRes.data.stats.balance_rub)
         setLoading(false)
-      })
+      }).catch(() => setLoading(false))
   }
 
   useEffect(load, [])

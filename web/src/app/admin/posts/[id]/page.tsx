@@ -28,7 +28,7 @@ export default function AdminEditPost() {
         })
         setCategories(cRes.data.data || [])
         setLoading(false)
-      })
+      }).catch(() => setLoading(false))
   }, [id])
 
   const save = async (status?: string) => {

@@ -20,7 +20,7 @@ export default function CartPage() {
 
   useEffect(() => {
     servicesApi.list()
-      .then(({ data }) => setAllServices(data))
+      .then(({ data }) => setAllServices(data)).catch(() => {})
       .catch(() => {})
   }, [])
 

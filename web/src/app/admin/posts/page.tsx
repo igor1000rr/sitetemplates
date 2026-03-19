@@ -13,7 +13,7 @@ export default function AdminPosts() {
     adminApi.posts({ status: filter || undefined }).then(({ data }) => {
       setPosts(data.data || [])
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }, [filter])
 
   const handleDelete = async (id: number) => {

@@ -35,7 +35,7 @@ export default function AdminTemplateEditorPage() {
     ]).then(([cats, plats]) => {
       setCategories(cats.data)
       setPlatforms(plats.data)
-    })
+    }).catch(() => {})
 
     if (!isNew) {
       api.get(`/admin/templates/${params.id}`).then(({ data }) => {

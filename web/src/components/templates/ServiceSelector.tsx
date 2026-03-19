@@ -36,7 +36,7 @@ export default function ServiceSelector({ templateId }: Props) {
 
   useEffect(() => {
     servicesApi.list()
-      .then(({ data }) => setServices(data))
+      .then(({ data }) => setServices(data)).catch(() => {})
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])

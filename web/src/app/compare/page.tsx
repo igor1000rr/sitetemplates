@@ -50,7 +50,7 @@ export default function ComparePage() {
     if (idArr.length < 2) { setLoading(false); return }
 
     compareApi.compare(idArr)
-      .then(({ data }) => setTemplates(data.data || []))
+      .then(({ data }) => setTemplates(data.data || [])).catch(() => {})
       .finally(() => setLoading(false))
   }, [params])
 

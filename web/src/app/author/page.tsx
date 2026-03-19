@@ -9,7 +9,7 @@ export default function AuthorDashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    authorApi.dashboard().then(({ data }) => { setData(data); setLoading(false) })
+    authorApi.dashboard().then(({ data }) => { setData(data); setLoading(false) }).catch(() => setLoading(false))
   }, [])
 
   if (loading) return <div className="animate-pulse text-white/20">Загрузка...</div>
