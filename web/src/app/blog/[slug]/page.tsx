@@ -7,7 +7,7 @@ import { apiFetch } from '@/lib/server-fetch'
 interface Props { params: { slug: string } }
 
 async function getPost(slug: string) {
-  const data = await apiFetch(`/api/blog/${slug}`, null)
+  const data = await apiFetch<any>(`/api/blog/${slug}`, null)
   if (!data) return null
   return data.data || data || null
 }

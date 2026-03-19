@@ -15,7 +15,7 @@ import { apiFetch } from '@/lib/server-fetch'
 interface Props { params: { slug: string } }
 
 async function getTemplate(slug: string) {
-  const data = await apiFetch(`/api/templates/${slug}`, null)
+  const data = await apiFetch<any>(`/api/templates/${slug}`, null)
   if (!data) return null
   return data.data || data || null
 }

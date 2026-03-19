@@ -6,7 +6,7 @@ import { apiFetch } from '@/lib/server-fetch'
 interface Props { params: { slug: string } }
 
 async function getAuthor(slug: string) {
-  const data = await apiFetch(`/api/authors/${slug}`, null)
+  const data = await apiFetch<any>(`/api/authors/${slug}`, null)
   if (!data) return null
   return data.data || data || null
 }
