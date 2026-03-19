@@ -7,6 +7,7 @@ use App\Models\SubscriptionPlan;
 use App\Services\SubscriptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class SubscriptionController extends Controller
 {
@@ -15,21 +16,23 @@ class SubscriptionController extends Controller
      */
     public function plans(): JsonResponse
     {
-        $plans = SubscriptionPlan::active()
-            ->orderBy('sort_order')
-            ->get()
-            ->map(fn ($p) => [
-                'id' => $p->id,
-                'name' => $p->name,
-                'slug' => $p->slug,
-                'description' => $p->description,
-                'price_rub' => $p->price / 100,
-                'annual_price_rub' => $p->annual_price ? $p->annual_price / 100 : null,
-                'monthly_from_annual' => $p->monthly_from_annual,
-                'downloads_per_month' => $p->downloads_per_month,
-                'features' => $p->features,
-                'is_popular' => $p->is_popular,
-            ]);
+        $plans = Cache::remember('subscription:plans', 1800, function () {
+            return SubscriptionPlan::active()
+                ->orderBy('sort_order')
+                ->get()
+                ->map(fn ($p) => [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'slug' => $p->slug,
+                    'description' => $p->description,
+                    'price_rub' => $p->price / 100,
+                    'annual_price_rub' => $p->annual_price ? $p->annual_price / 100 : null,
+                    'monthly_from_annual' => $p->monthly_from_annual,
+                    'downloads_per_month' => $p->downloads_per_month,
+                    'features' => $p->features,
+                    'is_popular' => $p->is_popular,
+                ]);
+        });
 
         return response()->json(['data' => $plans]);
     }

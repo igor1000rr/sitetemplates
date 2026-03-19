@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\PostCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class BlogController extends Controller
 {
@@ -96,15 +97,17 @@ class BlogController extends Controller
      */
     public function categories(): JsonResponse
     {
-        $cats = PostCategory::withCount(['posts' => fn ($q) => $q->published()])
-            ->orderBy('sort_order')
-            ->get()
-            ->map(fn ($c) => [
-                'id' => $c->id,
-                'name' => $c->name,
-                'slug' => $c->slug,
-                'posts_count' => $c->posts_count,
-            ]);
+        $cats = Cache::remember('blog:categories', 600, function () {
+            return PostCategory::withCount(['posts' => fn ($q) => $q->published()])
+                ->orderBy('sort_order')
+                ->get()
+                ->map(fn ($c) => [
+                    'id' => $c->id,
+                    'name' => $c->name,
+                    'slug' => $c->slug,
+                    'posts_count' => $c->posts_count,
+                ]);
+        });
 
         return response()->json(['data' => $cats]);
     }

@@ -6,6 +6,7 @@ use App\Http\Resources\TemplateListResource;
 use App\Http\Resources\TemplateResource;
 use App\Models\Template;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class TemplateController extends Controller
 {
@@ -72,12 +73,14 @@ class TemplateController extends Controller
      */
     public function featured()
     {
-        $templates = Template::published()
-            ->featured()
-            ->with(['category', 'platform', 'mainImage'])
-            ->orderBy('sort_order')
-            ->limit(6)
-            ->get();
+        $templates = Cache::remember('templates:featured', 300, function () {
+            return Template::published()
+                ->featured()
+                ->with(['category', 'platform', 'mainImage'])
+                ->orderBy('sort_order')
+                ->limit(6)
+                ->get();
+        });
 
         return TemplateListResource::collection($templates);
     }
