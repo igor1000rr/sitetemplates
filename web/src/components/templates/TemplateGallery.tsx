@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
+import LaptopFrame from '@/components/shared/LaptopFrame'
 
 interface GalleryImage {
   id: number
@@ -46,33 +47,37 @@ export default function TemplateGallery({ images, title }: Props) {
 
   return (
     <>
-      {/* Main image */}
-      <div
-        className="rounded-2xl overflow-hidden bg-bg-surface border border-white/[0.05] mb-3 cursor-zoom-in relative group"
-        onClick={() => setLightbox(true)}
-      >
-        <Image
-          src={images[selected].path}
-          alt={images[selected].alt || title}
-          width={800}
-          height={500}
-          className="w-full aspect-[16/10] object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition flex items-center justify-center opacity-0 group-hover:opacity-100">
-          <div className="bg-black/50 backdrop-blur-sm text-white/80 px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-2">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>
-            </svg>
-            Увеличить
+      {/* Main image in laptop frame */}
+      <div className="mb-3">
+        <LaptopFrame>
+          <div
+            className="relative aspect-[16/10] overflow-hidden cursor-zoom-in group"
+            onClick={() => setLightbox(true)}
+          >
+            <Image
+              src={images[selected].path}
+              alt={images[selected].alt || title}
+              width={800}
+              height={500}
+              className="w-full h-full object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition flex items-center justify-center opacity-0 group-hover:opacity-100">
+              <div className="bg-black/50 backdrop-blur-sm text-white/80 px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>
+                </svg>
+                Увеличить
+              </div>
+            </div>
+            {/* Image counter */}
+            {images.length > 1 && (
+              <div className="absolute bottom-3 right-3 bg-black/50 backdrop-blur-sm text-white/70 px-2.5 py-1 rounded-lg text-[10px] font-medium">
+                {selected + 1} / {images.length}
+              </div>
+            )}
           </div>
-        </div>
-        {/* Image counter */}
-        {images.length > 1 && (
-          <div className="absolute bottom-3 right-3 bg-black/50 backdrop-blur-sm text-white/70 px-2.5 py-1 rounded-lg text-[10px] font-medium">
-            {selected + 1} / {images.length}
-          </div>
-        )}
+        </LaptopFrame>
       </div>
 
       {/* Thumbnails */}
