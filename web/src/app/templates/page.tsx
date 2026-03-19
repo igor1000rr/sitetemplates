@@ -33,7 +33,7 @@ export default async function TemplatesPage({ searchParams }: Props) {
   const lastPage = meta.last_page || 1
 
   return (
-    <main className="min-h-screen pt-[20px] pb-16">
+    <main className="min-h-screen pt-[110px] pb-16">
       <BreadcrumbSchema items={[
         { name: 'Главная', url: '/' },
         { name: 'Каталог', url: '/templates' },
@@ -74,7 +74,7 @@ export default async function TemplatesPage({ searchParams }: Props) {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 animate-stagger">
                   {templates.map((t, i) => (
                     <TemplateCard key={t.id} template={t} priority={i < 3} />
                   ))}

@@ -36,23 +36,12 @@ export default function ServiceSelector({ templateId }: Props) {
 
   useEffect(() => {
     servicesApi.list()
-      .then(({ data }) => setServices(data)).catch(() => {})
+      .then(({ data }) => setServices(data))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
 
   if (loading || services.length === 0) return null
-
-  if (!inCart) {
-    return (
-      <div className="mt-6 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-        <h3 className="text-sm font-semibold text-white/80 mb-2">Дополнительные услуги</h3>
-        <p className="text-xs text-white/40">
-          Добавьте шаблон в корзину, чтобы выбрать доп. услуги: установка, SEO, наполнение и другие
-        </p>
-      </div>
-    )
-  }
 
   const grouped = services.reduce((acc, s) => {
     if (!acc[s.category]) acc[s.category] = []
@@ -66,20 +55,38 @@ export default function ServiceSelector({ templateId }: Props) {
   }, 0)
 
   return (
-    <div className="mt-6 space-y-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-white/80">Дополнительные услуги</h3>
+    <div className="mt-5 pt-5 border-t border-white/[0.05]">
+      {/* Заголовок секции */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-md bg-accent/10 flex items-center justify-center">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </div>
+          <h3 className="text-sm font-bold text-white/90">Дополнительные услуги</h3>
+        </div>
         {totalServices > 0 && (
-          <span className="text-xs font-medium text-accent">
+          <span className="text-sm font-bold text-accent animate-pulse-slow">
             +{totalServices.toLocaleString('ru-RU')} ₽
           </span>
         )}
       </div>
 
+      {/* Подсказка если не в корзине */}
+      {!inCart && (
+        <div className="mb-3 px-3 py-2 rounded-lg bg-accent/[0.06] border border-accent/15">
+          <p className="text-[11px] text-accent-pale/70">
+            ☝️ Добавьте шаблон в корзину, чтобы выбрать услуги
+          </p>
+        </div>
+      )}
+
+      {/* Услуги */}
       <div className="space-y-2">
         {Object.entries(grouped).map(([cat, items]) => (
           <div key={cat}>
-            <p className="text-[11px] uppercase tracking-wider text-white/30 mb-1.5 px-1">
+            <p className="text-[10px] uppercase tracking-wider text-white/25 mb-1.5 px-1 font-semibold">
               {categoryIcons[cat]} {categoryLabels[cat] || cat}
             </p>
             {items.map((service) => {
@@ -87,18 +94,23 @@ export default function ServiceSelector({ templateId }: Props) {
               return (
                 <button
                   key={service.id}
+                  disabled={!inCart}
                   onClick={() => toggleService(templateId, service.id)}
-                  className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-all mb-1.5 ${
+                  className={`w-full flex items-center justify-between p-3 rounded-xl text-left transition-all duration-200 mb-1.5 group ${
                     isSelected
-                      ? 'bg-accent/10 border border-accent/30'
-                      : 'bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12]'
+                      ? 'bg-accent/10 border border-accent/30 shadow-[0_0_15px_rgba(139,92,246,0.08)]'
+                      : inCart
+                        ? 'bg-white/[0.02] border border-white/[0.06] hover:border-accent/20 hover:bg-accent/[0.03]'
+                        : 'bg-white/[0.02] border border-white/[0.04] opacity-60'
                   }`}
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
                       <div
-                        className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 transition ${
-                          isSelected ? 'bg-accent text-white' : 'bg-white/[0.06] border border-white/[0.12]'
+                        className={`w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+                          isSelected
+                            ? 'bg-accent text-white scale-110'
+                            : 'bg-white/[0.06] border border-white/[0.15] group-hover:border-accent/30'
                         }`}
                       >
                         {isSelected && (
@@ -107,26 +119,28 @@ export default function ServiceSelector({ templateId }: Props) {
                           </svg>
                         )}
                       </div>
-                      <span className={`text-sm font-medium ${isSelected ? 'text-white' : 'text-white/70'}`}>
-                        {service.name}
-                      </span>
-                      {service.is_popular && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent/20 text-accent font-medium">
-                          Популярное
+                      <div>
+                        <span className={`text-[13px] font-semibold ${isSelected ? 'text-white' : 'text-white/70'}`}>
+                          {service.name}
                         </span>
-                      )}
+                        {service.is_popular && (
+                          <span className="ml-2 text-[9px] px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 font-bold uppercase tracking-wider">
+                            Хит
+                          </span>
+                        )}
+                        {service.short_description && (
+                          <p className="text-[11px] text-white/30 mt-0.5 line-clamp-1">
+                            {service.short_description}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    {service.short_description && (
-                      <p className="text-xs text-white/40 mt-0.5 ml-6 line-clamp-1">
-                        {service.short_description}
-                      </p>
-                    )}
                   </div>
                   <div className="text-right ml-3 flex-shrink-0">
-                    <span className={`text-sm font-semibold ${isSelected ? 'text-accent' : 'text-white/60'}`}>
-                      {service.price_rub.toLocaleString('ru-RU')} ₽
+                    <span className={`text-[14px] font-bold ${isSelected ? 'text-accent-pale' : 'text-white/50'}`}>
+                      +{service.price_rub.toLocaleString('ru-RU')} ₽
                     </span>
-                    <p className="text-[10px] text-white/30">{service.estimated_days} дн.</p>
+                    <p className="text-[10px] text-white/20">{service.estimated_days} дн.</p>
                   </div>
                 </button>
               )

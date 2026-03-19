@@ -31,8 +31,9 @@ export default function AddToCartButton({ item }: Props) {
   return (
     <button
       onClick={handleAdd}
-      className="w-full bg-accent hover:bg-accent-dark text-white py-3.5 rounded-xl text-sm font-bold transition"
+      className="w-full relative bg-accent hover:bg-accent-dark text-white py-4 rounded-xl text-[15px] font-bold transition-all duration-200 hover:shadow-[0_0_30px_rgba(139,92,246,0.3)] hover:scale-[1.02] active:scale-[0.98]"
     >
+      <span className="absolute inset-0 rounded-xl bg-accent/30 animate-ping opacity-20 pointer-events-none" style={{ animationDuration: '2s' }} />
       В корзину
     </button>
   )

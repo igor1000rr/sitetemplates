@@ -61,7 +61,7 @@ export default async function HomePage() {
 
       {/* AI Features */}
       <section className="max-w-[1000px] mx-auto px-8 mb-14">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 animate-stagger">
           {[
             { icon: '🤖', title: 'AI подбирает шаблон', desc: 'Расскажите о бизнесе — AI проанализирует 300+ шаблонов и найдёт идеальный за 30 секунд' },
             { icon: '⚡', title: 'Установка в 1 клик', desc: 'Укажите FTP-доступы — и шаблон автоматически установится на ваш хостинг. Без кода.' },
@@ -82,7 +82,7 @@ export default async function HomePage() {
           <p className="text-accent-light text-[11px] font-bold tracking-[2px] uppercase mb-2">Просто</p>
           <h2 className="font-display text-[28px] font-bold tracking-tight">Как это работает</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-stagger">
           {[
             { step: '01', title: 'Выберите шаблон', desc: 'Используйте AI-подбор или найдите в каталоге. Посмотрите Live Preview.' },
             { step: '02', title: 'Оплатите', desc: 'Карта, СБП или ЮMoney. Или оформите подписку для безлимита.' },
@@ -168,7 +168,7 @@ export default async function HomePage() {
             </div>
             <Link href="/templates?sort=newest" className="text-white/30 text-sm hover:text-accent-light transition">Все новинки →</Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 animate-stagger">
             {newArrivals.map((t) => (
               <TemplateCard key={t.id} template={t} />
             ))}
@@ -184,7 +184,7 @@ export default async function HomePage() {
             Не просто шаблоны — <span className="text-accent-pale">AI-платформа</span>
           </h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-stagger">
           {[
             { t: 'AI-подбор шаблона', d: 'Опишите бизнес — AI подберёт идеальный шаблон и сгенерирует контент', i: '🤖' },
             { t: 'Live Preview', d: 'Смотрите как будет выглядеть ваш сайт до покупки в реальном времени', i: '👁️' },
@@ -209,7 +209,7 @@ export default async function HomePage() {
           <h2 className="font-display text-[28px] font-bold tracking-tight mb-2">Что говорят клиенты</h2>
           <p className="text-white/25 text-[13px]">12 400+ пользователей · Средняя оценка 4.9</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 animate-stagger">
           {(reviews.length > 0 ? reviews : [
             { name: 'Алексей М.', text: 'Запустил сайт клиники за вечер. Раньше платил агентству 180 000₽, а тут за 4 990₽ получил то же самое.', rating: 5, template_title: 'Стоматология' },
             { name: 'Мария К.', text: 'AI подобрал идеальный шаблон и сгенерировал все тексты для услуг. Экономия минимум 2 недели работы.', rating: 5, template_title: 'Салон красоты' },
@@ -240,7 +240,7 @@ export default async function HomePage() {
           <h2 className="font-display text-[36px] font-bold tracking-tight mb-2">Окупается с первого клиента</h2>
           <p className="text-white/25 text-[14px]">Сайт от агентства — от 150 000 ₽. У нас — от 990 ₽/мес</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 animate-stagger">
           {[
             { name: 'Стартовый', price: '990', desc: '5 скачиваний в месяц', features: ['5 шаблонов/мес', 'Все шаблоны каталога', 'Обновления шаблонов', 'Email-поддержка'] },
             { name: 'Про', price: '1 990', desc: 'Безлимитный доступ', features: ['Безлимит скачиваний', 'Все шаблоны каталога', 'PSD/Figma исходники', 'Приоритетная поддержка', 'Обновления шаблонов'], popular: true },

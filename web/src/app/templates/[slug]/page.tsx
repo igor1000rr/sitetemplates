@@ -60,7 +60,7 @@ export default async function TemplatePage({ params }: Props) {
   }
 
   return (
-    <main className="min-h-screen pt-[20px] pb-16">
+    <main className="min-h-screen pt-[110px] pb-16">
       <ProductSchema
         name={t.title}
         description={t.short_desc || t.description?.slice(0, 200) || ''}
@@ -99,7 +99,7 @@ export default async function TemplatePage({ params }: Props) {
 
         <div className="flex gap-10 flex-wrap lg:flex-nowrap">
           {/* Gallery */}
-          <div className="flex-1 min-w-[300px]">
+          <div className="flex-1 min-w-[300px] animate-slide-up">
             <TemplateGallery images={t.images || []} title={t.title} />
 
             {/* Share */}
@@ -108,7 +108,7 @@ export default async function TemplatePage({ params }: Props) {
             </div>
 
             {/* Description */}
-            <div className="mt-8">
+            <div className="mt-8" style={{ animation: 'slideUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.15s both' }}>
               <h2 className="font-display text-lg font-bold mb-4">Описание</h2>
               <div className="text-white/40 text-sm leading-relaxed whitespace-pre-line">{t.description}</div>
             </div>
@@ -163,9 +163,9 @@ export default async function TemplatePage({ params }: Props) {
           </div>
 
           {/* Sidebar */}
-          <aside className="w-full lg:w-[360px] shrink-0">
+          <aside className="w-full lg:w-[360px] shrink-0" style={{ animation: 'slideUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.1s both' }}>
             <div className="sticky top-[110px]">
-              <div className="bg-bg-card rounded-2xl border border-white/[0.05] p-6">
+              <div className="bg-bg-card rounded-2xl border border-white/[0.05] p-6 shadow-[0_8px_40px_rgba(0,0,0,0.3)]">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="bg-accent/[0.08] text-accent-light px-3 py-1 rounded-md text-xs font-semibold">{t.platform.name}</span>
                   <span className="text-white/25 text-xs">{t.template_type}</span>
