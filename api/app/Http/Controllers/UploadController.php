@@ -22,6 +22,12 @@ class UploadController extends Controller
         $ext = strtolower($file->getClientOriginalExtension());
         $folder = $request->input('folder', 'templates');
 
+        // Белый список расширений
+        $allowed = ['zip', 'rar', '7z', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'pdf'];
+        if (!in_array($ext, $allowed)) {
+            return response()->json(['message' => "Тип файла .{$ext} не разрешён"], 422);
+        }
+
         // Определяем подпапку по типу файла
         $subfolder = match (true) {
             in_array($ext, ['zip', 'rar', '7z']) => "{$folder}/zips",

@@ -77,7 +77,7 @@ Route::get('/templates/{slug}', [TemplateController::class, 'show']);
 Route::get('/reviews', [ReviewController::class, 'all']);
 Route::get('/reviews/{template}', [ReviewController::class, 'index']);
 
-Route::post('/promo/validate', [PromoCodeController::class, 'validate']);
+Route::post('/promo/validate', [PromoCodeController::class, 'validate'])->middleware('throttle:10,1');
 
 // Блог (публичный)
 Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index']);
@@ -95,7 +95,7 @@ Route::post('/ai/chat', [AiChatController::class, 'chat'])->middleware('throttle
 
 // Newsletter
 Route::post('/newsletter/subscribe', [\App\Http\Controllers\NewsletterController::class, 'subscribe'])->middleware('throttle:5,1');
-Route::post('/newsletter/unsubscribe', [\App\Http\Controllers\NewsletterController::class, 'unsubscribe']);
+Route::post('/newsletter/unsubscribe', [\App\Http\Controllers\NewsletterController::class, 'unsubscribe'])->middleware('throttle:5,1');
 
 // Recent purchases for social proof (anonymized, cached)
 Route::get('/social-proof/recent', [\App\Http\Controllers\SocialProofController::class, 'recent']);
@@ -174,7 +174,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/cart/abandon', [\App\Http\Controllers\AbandonedCartController::class, 'clear']);
 
     // ─── AUTHOR (стать автором — доступно всем авторизованным) ───
-    Route::post('/author/register', [\App\Http\Controllers\Author\AuthorRegisterController::class, 'register']);
+    Route::post('/author/register', [\App\Http\Controllers\Author\AuthorRegisterController::class, 'register'])->middleware('throttle:5,1');
 
     // ─── AUTHOR PANEL ───
     Route::middleware('author')->prefix('author')->group(function () {
