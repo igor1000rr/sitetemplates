@@ -4,9 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Template extends Model
 {
+    protected static function booted(): void
+    {
+        static::saved(fn () => Cache::forget('templates:featured'));
+        static::deleted(fn () => Cache::forget('templates:featured'));
+    }
     protected $fillable = [
         'title', 'slug', 'description', 'short_desc',
         'price', 'old_price',

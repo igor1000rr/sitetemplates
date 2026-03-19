@@ -3,9 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Service extends Model
 {
+    protected static function booted(): void
+    {
+        static::saved(fn () => Cache::forget('services:all'));
+        static::deleted(fn () => Cache::forget('services:all'));
+    }
+
     protected $fillable = [
         'name', 'slug', 'short_description', 'description', 'price',
         'icon', 'category', 'estimated_days', 'is_popular', 'is_active', 'sort_order',
