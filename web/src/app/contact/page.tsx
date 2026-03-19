@@ -61,22 +61,22 @@ export default function ContactPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2">Имя</label>
-                  <input type="text" value={form.name} onChange={e => set('name', e.target.value)} required
+                  <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2" htmlFor="contact-name">Имя</label>
+                  <input type="text" id="contact-name" value={form.name} onChange={e => set('name', e.target.value)} required
                     className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-white text-sm outline-none focus:border-accent/30 transition placeholder:text-white/15"
                     placeholder="Ваше имя" />
                 </div>
                 <div>
-                  <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2">Email</label>
-                  <input type="email" value={form.email} onChange={e => set('email', e.target.value)} required
+                  <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2" htmlFor="contact-email">Email</label>
+                  <input type="email" id="contact-email" value={form.email} onChange={e => set('email', e.target.value)} required
                     className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-white text-sm outline-none focus:border-accent/30 transition placeholder:text-white/15"
                     placeholder="email@example.com" />
                 </div>
               </div>
 
               <div className="mb-4">
-                <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2">Тема</label>
-                <select value={form.subject} onChange={e => set('subject', e.target.value)} required
+                <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2" htmlFor="contact-subject">Тема</label>
+                <select id="contact-subject" value={form.subject} onChange={e => set('subject', e.target.value)} required
                   className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-white text-sm outline-none focus:border-accent/30 transition">
                   <option value="" className="bg-bg-card text-white/30">Выберите тему</option>
                   <option value="Вопрос по шаблону" className="bg-bg-card">Вопрос по шаблону</option>
@@ -90,8 +90,8 @@ export default function ContactPage() {
               </div>
 
               <div className="mb-6">
-                <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2">Сообщение</label>
-                <textarea value={form.message} onChange={e => set('message', e.target.value)} required rows={5}
+                <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2" htmlFor="contact-message">Сообщение</label>
+                <textarea id="contact-message" value={form.message} onChange={e => set('message', e.target.value)} required rows={5}
                   className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-white text-sm outline-none focus:border-accent/30 transition resize-none placeholder:text-white/15"
                   placeholder="Опишите ваш вопрос..." />
               </div>

@@ -3,6 +3,7 @@ import Image from 'next/image'
 import type { Metadata } from 'next'
 import { ArticleSchema, BreadcrumbSchema } from '@/components/seo/JsonLd'
 import { apiFetch } from '@/lib/server-fetch'
+import { sanitizeHtml } from '@/lib/sanitize'
 
 interface Props { params: { slug: string } }
 
@@ -136,7 +137,7 @@ export default async function BlogArticle({ params }: Props) {
             prose-pre:bg-bg-surface prose-pre:border prose-pre:border-white/[0.05] prose-pre:rounded-xl
             prose-img:rounded-xl
           "
-          dangerouslySetInnerHTML={{ __html: post.content }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
         />
 
         {/* Tags */}

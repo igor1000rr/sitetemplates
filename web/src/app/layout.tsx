@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import dynamic from 'next/dynamic'
+import { Inter, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import TopBar from '@/components/layout/TopBar'
 import Navbar from '@/components/layout/Navbar'
@@ -16,6 +17,18 @@ const AiChatWidget = dynamic(() => import('@/components/shared/AiChatWidget'), {
 const CookieConsent = dynamic(() => import('@/components/shared/CookieConsent'), { ssr: false })
 const ScrollToTop = dynamic(() => import('@/components/shared/ScrollToTop'), { ssr: false })
 const EmailCapture = dynamic(() => import('@/components/shared/EmailCapture'), { ssr: false })
+
+const inter = Inter({
+  subsets: ['latin', 'cyrillic'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: {
@@ -56,7 +69,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru">
+    <html lang="ru" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <head>
         {/* Preconnect to external origins */}
         <link rel="preconnect" href="https://s3.timeweb.cloud" crossOrigin="anonymous" />

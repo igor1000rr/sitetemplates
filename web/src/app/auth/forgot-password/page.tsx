@@ -59,8 +59,8 @@ export default function ForgotPasswordPage() {
           )}
 
           <div className="mb-6">
-            <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2">Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
+            <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2" htmlFor="forgot-email">Email</label>
+            <input type="email" id="forgot-email" value={email} onChange={e => setEmail(e.target.value)} required
               className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-white text-sm outline-none focus:border-accent/30 transition placeholder:text-white/15"
               placeholder="email@example.com" />
           </div>

@@ -40,9 +40,10 @@ export default function LoginPage() {
           )}
 
           <div className="mb-4">
-            <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2">Email</label>
+            <label htmlFor="login-email" className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2">Email</label>
             <input
               type="email"
+              id="login-email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -53,13 +54,14 @@ export default function LoginPage() {
 
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
-              <label className="text-white/30 text-xs font-semibold uppercase tracking-wider">Пароль</label>
+              <label htmlFor="login-password" className="text-white/30 text-xs font-semibold uppercase tracking-wider">Пароль</label>
               <Link href="/auth/forgot-password" className="text-accent-light/60 text-[11px] hover:text-accent-light transition">
                 Забыли пароль?
               </Link>
             </div>
             <input
               type="password"
+              id="login-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required

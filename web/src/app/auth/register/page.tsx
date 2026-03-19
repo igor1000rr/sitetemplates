@@ -58,7 +58,7 @@ export default function RegisterPage() {
           )}
 
           <div className="mb-4">
-            <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2">Имя</label>
+            <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2" htmlFor="reg-name">Имя</label>
             <input
               type="text" value={name} onChange={(e) => setName(e.target.value)} required
               className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-white text-sm outline-none focus:border-accent/30 transition placeholder:text-white/15"
@@ -67,7 +67,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="mb-4">
-            <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2">Email</label>
+            <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2" htmlFor="reg-email">Email</label>
             <input
               type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
               className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-white text-sm outline-none focus:border-accent/30 transition placeholder:text-white/15"
@@ -76,7 +76,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="mb-6">
-            <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2">Пароль</label>
+            <label className="block text-white/30 text-xs font-semibold uppercase tracking-wider mb-2" htmlFor="reg-password">Пароль</label>
             <input
               type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8}
               className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-white text-sm outline-none focus:border-accent/30 transition placeholder:text-white/15"
