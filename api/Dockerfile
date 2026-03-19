@@ -35,6 +35,11 @@ RUN echo "APP_KEY=base64:dGVtcGxhdGVuYW1lLWJ1aWxkLWtleS0xMjM0NTY3OA==" > .env
 
 RUN composer dump-autoload --optimize
 
+# Discover packages + publish Filament assets
+RUN php artisan package:discover --ansi \
+    && php artisan filament:assets \
+    && php artisan storage:link 2>/dev/null || true
+
 # Config files
 COPY docker/php.ini /usr/local/etc/php/conf.d/99-app.ini
 COPY docker/supervisord.conf /etc/supervisord.conf
