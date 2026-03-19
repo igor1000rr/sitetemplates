@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import LaptopFrame from '@/components/shared/LaptopFrame'
 
 interface RecentItem {
   id: number
@@ -49,14 +50,18 @@ export default function RecentlyViewed({ excludeId }: { excludeId?: number }) {
         {items.map((t) => (
           <Link key={t.id} href={`/templates/${t.slug}`}
             className="group shrink-0 w-[200px] bg-bg-card rounded-xl overflow-hidden border border-white/[0.05] hover:border-accent/15 transition">
-            <div className="aspect-[16/10] bg-bg-surface overflow-hidden">
-              {t.image ? (
-                <Image src={t.image} alt={t.title} width={320} height={200} sizes="200px" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-white/10">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+            <div className="bg-bg-surface pt-3 pb-1 px-2">
+              <LaptopFrame compact>
+                <div className="aspect-[16/10] overflow-hidden">
+                  {t.image ? (
+                    <Image src={t.image} alt={t.title} width={320} height={200} sizes="200px" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-white/10 bg-bg-card">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+                    </div>
+                  )}
                 </div>
-              )}
+              </LaptopFrame>
             </div>
             <div className="p-3">
               <h3 className="text-xs font-semibold line-clamp-1 mb-1 group-hover:text-accent-pale transition">{t.title}</h3>

@@ -11,6 +11,7 @@ import RecentlyViewed from '@/components/shared/RecentlyViewed'
 import { ProductSchema, BreadcrumbSchema } from '@/components/seo/JsonLd'
 import CountdownTimer from '@/components/shared/CountdownTimer'
 import { apiFetch } from '@/lib/server-fetch'
+import LaptopFrame from '@/components/shared/LaptopFrame'
 
 interface Props { params: { slug: string } }
 
@@ -290,8 +291,12 @@ export default async function TemplatePage({ params }: Props) {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
               {similar.map((s: any) => (
                 <a key={s.id} href={`/templates/${s.slug}`} className="group bg-bg-card rounded-xl overflow-hidden border border-white/[0.05] hover:border-accent/15 transition">
-                  <div className="aspect-[16/10] bg-bg-surface overflow-hidden">
-                    {s.image && <Image src={s.image} alt={s.title} width={480} height={300} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />}
+                  <div className="bg-bg-surface pt-4 pb-1 px-3">
+                    <LaptopFrame compact>
+                      <div className="aspect-[16/10] overflow-hidden">
+                        {s.image && <Image src={s.image} alt={s.title} width={480} height={300} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />}
+                      </div>
+                    </LaptopFrame>
                   </div>
                   <div className="p-4">
                     <h3 className="text-sm font-semibold leading-snug mb-2 line-clamp-2">{s.title}</h3>
