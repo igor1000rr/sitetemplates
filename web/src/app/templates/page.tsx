@@ -4,10 +4,9 @@ import TemplateCard from '@/components/templates/TemplateCard'
 import CatalogFilters from '@/components/templates/CatalogFilters'
 import Breadcrumbs from '@/components/shared/Breadcrumbs'
 import { BreadcrumbSchema } from '@/components/seo/JsonLd'
+import { apiFetchData, apiFetchPaginated } from '@/lib/server-fetch'
 
 export const dynamic = 'force-dynamic'
-
-const API_URL = process.env.API_URL || 'http://localhost:8000'
 
 export const metadata: Metadata = {
   title: 'Каталог шаблонов — WordPress и Tilda',
@@ -18,38 +17,14 @@ interface Props {
   searchParams: Record<string, string | undefined>
 }
 
-async function getTemplates(params: Record<string, string | undefined>) {
-  const sp = new URLSearchParams()
-  Object.entries(params).forEach(([k, v]) => { if (v) sp.set(k, v) })
-  try {
-    const res = await fetch(`${API_URL}/api/templates?${sp}`, { cache: 'no-store' })
-    if (!res.ok) return { data: [], meta: {} }
-    const json = await res.json()
-    return { data: json.data || [], meta: json.meta || {} }
-  } catch { return { data: [], meta: {} } }
-}
-
-async function getCategories(): Promise<Category[]> {
-  try {
-    const res = await fetch(`${API_URL}/api/categories`, { cache: 'no-store' })
-    const d = await res.json()
-    return Array.isArray(d) ? d : (d.data || [])
-  } catch { return [] }
-}
-
-async function getPlatforms(): Promise<Platform[]> {
-  try {
-    const res = await fetch(`${API_URL}/api/platforms`, { cache: 'no-store' })
-    const d = await res.json()
-    return Array.isArray(d) ? d : (d.data || [])
-  } catch { return [] }
-}
-
 export default async function TemplatesPage({ searchParams }: Props) {
+  const sp = new URLSearchParams()
+  Object.entries(searchParams).forEach(([k, v]) => { if (v) sp.set(k, v) })
+
   const [data, categories, platforms] = await Promise.all([
-    getTemplates(searchParams),
-    getCategories(),
-    getPlatforms(),
+    apiFetchPaginated<TemplateListItem>(`/api/templates?${sp}`),
+    apiFetchData<Category>('/api/categories'),
+    apiFetchData<Platform>('/api/platforms'),
   ])
 
   const templates: TemplateListItem[] = data.data || []

@@ -10,18 +10,14 @@ import TrackView from '@/components/shared/TrackView'
 import RecentlyViewed from '@/components/shared/RecentlyViewed'
 import { ProductSchema, BreadcrumbSchema } from '@/components/seo/JsonLd'
 import CountdownTimer from '@/components/shared/CountdownTimer'
-
-const API_URL = process.env.API_URL || 'http://localhost:8000'
+import { apiFetch } from '@/lib/server-fetch'
 
 interface Props { params: { slug: string } }
 
 async function getTemplate(slug: string) {
-  try {
-    const res = await fetch(`${API_URL}/api/templates/${slug}`, { cache: 'no-store' })
-    if (!res.ok) return null
-    const data = await res.json()
-    return data.data || data || null
-  } catch { return null }
+  const data = await apiFetch(`/api/templates/${slug}`, null)
+  if (!data) return null
+  return data.data || data || null
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -70,15 +66,15 @@ export default async function TemplatePage({ params }: Props) {
         price={t.price_rub}
         rating={t.reviews_count > 0 ? t.rating : undefined}
         reviewCount={t.reviews_count > 0 ? t.reviews_count : undefined}
-        url={`https://templatename.ru/templates/${t.slug}`}
+        url={`https://aitempl.ru/templates/${t.slug}`}
         category={t.category?.name}
         brand={t.platform?.name}
       />
       <BreadcrumbSchema items={[
-        { name: 'Главная', url: 'https://templatename.ru' },
-        { name: 'Каталог', url: 'https://templatename.ru/templates' },
-        ...(t.category ? [{ name: t.category.name, url: `https://templatename.ru/templates?category=${t.category.slug}` }] : []),
-        { name: t.title, url: `https://templatename.ru/templates/${t.slug}` },
+        { name: 'Главная', url: 'https://aitempl.ru' },
+        { name: 'Каталог', url: 'https://aitempl.ru/templates' },
+        ...(t.category ? [{ name: t.category.name, url: `https://aitempl.ru/templates?category=${t.category.slug}` }] : []),
+        { name: t.title, url: `https://aitempl.ru/templates/${t.slug}` },
       ]} />
 
       {/* Track view */}

@@ -1,4 +1,4 @@
-# TemplateName
+# AITempl
 
 Маркетплейс готовых шаблонов сайтов с AI-подбором, подписками, доп. услугами и разработкой под ключ.
 
@@ -16,7 +16,7 @@
 ## Структура
 
 ```
-templatename/
+aitempl/
 ├── api/          # Laravel 11 backend (240+ файлов)
 ├── web/          # Next.js 14 frontend (200+ файлов)
 ├── deploy/       # Docker, nginx, deploy.sh
@@ -28,8 +28,8 @@ templatename/
 
 ```bash
 # 1. Клонировать
-git clone git@github.com:antsincgame/templatename.git
-cd templatename
+git clone git@github.com:antsincgame/aitempl.git
+cd aitempl
 
 # 2. Настроить переменные
 cp .env.example .env
@@ -45,7 +45,7 @@ chmod +x deploy/deploy.sh
 
 ## Автодеплой
 
-Для Coolify: указать репо `antsincgame/templatename`, docker-compose.prod.yml из `deploy/`.
+Для Coolify: указать репо `antsincgame/aitempl`, docker-compose.prod.yml из `deploy/`.
 
 ## Реквизиты
 

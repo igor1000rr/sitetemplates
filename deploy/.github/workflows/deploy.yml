@@ -14,7 +14,7 @@ on:
     branches: [main]
 
 env:
-  PROJECT_DIR: /opt/templatename
+  PROJECT_DIR: /opt/aitempl
 
 jobs:
   deploy:

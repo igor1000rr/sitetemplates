@@ -1,6 +1,6 @@
 {
-  "name": "TemplateName — Шаблоны сайтов",
-  "short_name": "TemplateName",
+  "name": "AITempl — Шаблоны сайтов",
+  "short_name": "AITempl",
   "description": "AI-платформа для запуска сайтов. 326+ шаблонов WordPress и Tilda.",
   "start_url": "/",
   "display": "standalone",

@@ -2,46 +2,26 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import Breadcrumbs from '@/components/shared/Breadcrumbs'
 import { BreadcrumbSchema } from '@/components/seo/JsonLd'
+import { apiFetchPaginated, apiFetchData } from '@/lib/server-fetch'
 
 export const dynamic = 'force-dynamic'
-
-const API_URL = process.env.API_URL || 'http://localhost:8000'
 
 export const metadata: Metadata = {
   title: 'Блог — Полезные статьи о создании сайтов',
   description: 'Советы по выбору шаблона, настройке сайта, SEO-продвижению и веб-разработке.',
 }
 
-async function getPosts(params: Record<string, string> = {}) {
-  try {
-    const sp = new URLSearchParams(params)
-    const res = await fetch(`${API_URL}/api/blog?${sp}`, { cache: 'no-store' })
-    if (!res.ok) return { data: [], meta: {} }
-    const json = await res.json()
-    return { data: json.data || [], meta: json.meta || {} }
-  } catch { return { data: [], meta: {} } }
-}
-
-async function getCategories() {
-  try {
-    const res = await fetch(`${API_URL}/api/blog/categories`, { cache: 'no-store' })
-    if (!res.ok) return { data: [] }
-    const json = await res.json()
-    return { data: Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []) }
-  } catch { return { data: [] } }
-}
-
 interface Props { searchParams: Record<string, string> }
 
 export default async function BlogPage({ searchParams }: Props) {
-  const [postsData, catsData] = await Promise.all([
-    getPosts(searchParams),
-    getCategories(),
+  const sp = new URLSearchParams(searchParams)
+  const [postsData, categories] = await Promise.all([
+    apiFetchPaginated(`/api/blog?${sp}`),
+    apiFetchData('/api/blog/categories'),
   ])
 
   const posts = postsData.data || []
   const meta = postsData.meta || {}
-  const categories = catsData.data || []
   const activeCategory = searchParams.category || ''
 
   return (

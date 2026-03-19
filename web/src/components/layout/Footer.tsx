@@ -35,7 +35,7 @@ export default function Footer() {
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
               </div>
               <span className="text-[15px] font-extrabold tracking-tight">
-                Template<span className="text-accent-pale">Name</span>
+                AI<span className="text-accent-pale">Templ</span>
               </span>
             </div>
             <p className="text-white/20 text-xs leading-relaxed mb-4">
@@ -67,7 +67,7 @@ export default function Footer() {
 
         <div className="pt-6 border-t border-white/[0.03] flex flex-col gap-3 text-white/15 text-[11px]">
           <div className="flex justify-between items-center flex-wrap gap-4">
-            <span>© 2026 TemplateName. Все права защищены.</span>
+            <span>© {new Date().getFullYear()} AITempl. Все права защищены.</span>
             <div className="flex gap-6">
               <Link href="/legal/privacy" className="hover:text-white/30 transition">Политика конфиденциальности</Link>
               <Link href="/legal/terms" className="hover:text-white/30 transition">Оферта</Link>

@@ -1,11 +1,11 @@
 #!/bin/bash
-# TemplateName — Полная установка на VPS
+# AITempl — Полная установка на VPS
 # Запуск: bash setup.sh
 
 set -e
 
 echo "========================================="
-echo "  TemplateName — Установка на VPS"
+echo "  AITempl — Установка на VPS"
 echo "========================================="
 
 # ─── 1. Обновление системы ───
@@ -158,7 +158,7 @@ echo "  2. docker compose restart       — перезапустить"
 echo "  3. Привязать домен (DNS A-запись → 147.45.155.40)"
 echo "  4. Установить SSL:"
 echo "     apt install certbot"
-echo "     certbot certonly --standalone -d templatename.ru"
+echo "     certbot certonly --standalone -d aitempl.ru"
 echo "     # скопировать сертификаты в deploy/ssl/"
 echo "     docker compose restart"
 echo ""

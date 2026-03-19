@@ -21,13 +21,13 @@ export function ProductSchema({ name, description, image, price, currency = 'RUB
     description,
     url,
     category: category || 'Website Template',
-    brand: { '@type': 'Brand', name: brand || 'TemplateName' },
+    brand: { '@type': 'Brand', name: brand || 'AITempl' },
     offers: {
       '@type': 'Offer',
       price: price,
       priceCurrency: currency,
       availability: 'https://schema.org/InStock',
-      seller: { '@type': 'Organization', name: 'TemplateName' },
+      seller: { '@type': 'Organization', name: 'AITempl' },
     },
   }
 
@@ -93,11 +93,11 @@ export function ArticleSchema({ title, description, image, url, datePublished, d
     url,
     datePublished,
     dateModified: dateModified || datePublished,
-    author: { '@type': 'Person', name: author || 'TemplateName' },
+    author: { '@type': 'Person', name: author || 'AITempl' },
     publisher: {
       '@type': 'Organization',
-      name: 'TemplateName',
-      logo: { '@type': 'ImageObject', url: 'https://templatename.ru/logo.png' },
+      name: 'AITempl',
+      logo: { '@type': 'ImageObject', url: 'https://aitempl.ru/logo.png' },
     },
   }
   if (image) schema.image = image
@@ -137,15 +137,15 @@ export function OrganizationSchema() {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'TemplateName',
-    url: 'https://templatename.ru',
-    logo: 'https://templatename.ru/logo.png',
+    name: 'AITempl',
+    url: 'https://aitempl.ru',
+    logo: 'https://aitempl.ru/logo.png',
     description: 'AI-платформа для запуска сайтов. 326+ шаблонов WordPress и Tilda для любого бизнеса.',
     sameAs: [],
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer service',
-      email: 'support@templatename.ru',
+      email: 'support@aitempl.ru',
       availableLanguage: 'Russian',
     },
   }
@@ -162,11 +162,11 @@ export function WebsiteSearchSchema() {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'TemplateName',
-    url: 'https://templatename.ru',
+    name: 'AITempl',
+    url: 'https://aitempl.ru',
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://templatename.ru/templates?search={search_term_string}',
+      target: 'https://aitempl.ru/templates?search={search_term_string}',
       'query-input': 'required name=search_term_string',
     },
   }

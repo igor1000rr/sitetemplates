@@ -19,22 +19,22 @@ const EmailCapture = dynamic(() => import('@/components/shared/EmailCapture'), {
 
 export const metadata: Metadata = {
   title: {
-    default: 'TemplateName — Сайт для бизнеса за 3 минуты',
-    template: '%s | TemplateName',
+    default: 'AITempl — Сайт для бизнеса за 3 минуты',
+    template: '%s | AITempl',
   },
   description: 'AI подберёт дизайн, напишет тексты и настроит SEO. 326+ шаблонов WordPress и Tilda для любого бизнеса.',
   keywords: ['шаблоны сайтов', 'WordPress', 'Tilda', 'купить шаблон', 'сайт для бизнеса'],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://templatename.ru'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://aitempl.ru'),
   openGraph: {
     type: 'website',
     locale: 'ru_RU',
-    siteName: 'TemplateName',
+    siteName: 'AITempl',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'TemplateName — AI-платформа для запуска сайтов',
+        alt: 'AITempl — AI-платформа для запуска сайтов',
       },
     ],
   },

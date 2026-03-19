@@ -43,7 +43,7 @@ class ForgotPasswordController extends Controller
             'resetUrl' => $resetUrl,
         ], function ($mail) use ($user) {
             $mail->to($user->email, $user->name)
-                ->subject('Сброс пароля — TemplateName');
+                ->subject('Сброс пароля — AITempl');
         });
 
         return response()->json(['message' => 'Если аккаунт существует, мы отправили ссылку для сброса.']);

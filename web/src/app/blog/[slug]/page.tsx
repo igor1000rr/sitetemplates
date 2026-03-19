@@ -2,18 +2,14 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { Metadata } from 'next'
 import { ArticleSchema, BreadcrumbSchema } from '@/components/seo/JsonLd'
-
-const API_URL = process.env.API_URL || 'http://localhost:8000'
+import { apiFetch } from '@/lib/server-fetch'
 
 interface Props { params: { slug: string } }
 
 async function getPost(slug: string) {
-  try {
-    const res = await fetch(`${API_URL}/api/blog/${slug}`, { cache: 'no-store' })
-    if (!res.ok) return null
-    const data = await res.json()
-    return data.data || data || null
-  } catch { return null }
+  const data = await apiFetch(`/api/blog/${slug}`, null)
+  if (!data) return null
+  return data.data || data || null
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -47,7 +43,7 @@ export default async function BlogArticle({ params }: Props) {
 
   const post = data.post
   const related = data.related || []
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://templatename.ru'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aitempl.ru'
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -56,10 +52,10 @@ export default async function BlogArticle({ params }: Props) {
     description: post.excerpt || '',
     image: post.cover_image || undefined,
     datePublished: post.published_at,
-    author: { '@type': 'Person', name: post.author?.name || 'TemplateName' },
+    author: { '@type': 'Person', name: post.author?.name || 'AITempl' },
     publisher: {
       '@type': 'Organization',
-      name: 'TemplateName',
+      name: 'AITempl',
       url: siteUrl,
     },
     mainEntityOfPage: `${siteUrl}/blog/${params.slug}`,

@@ -2,52 +2,21 @@ import type { Metadata } from 'next'
 import type { TemplateListItem, Category } from '@/types'
 import HeroSearch from '@/components/home/HeroSearch'
 import TemplateCard from '@/components/templates/TemplateCard'
+import { apiFetchData } from '@/lib/server-fetch'
 
 export const metadata: Metadata = {
-  title: 'TemplateName — Шаблоны сайтов для бизнеса',
+  title: 'AITempl — Шаблоны сайтов для бизнеса',
   description: 'AI-платформа для запуска сайтов. 326+ шаблонов WordPress и Tilda. Готовый сайт за 5 минут.',
 }
 
 export const dynamic = 'force-dynamic'
 
-const API_URL = process.env.API_URL || 'http://localhost:8000'
-
-async function getFeaturedTemplates(): Promise<TemplateListItem[]> {
-  try {
-    const res = await fetch(`${API_URL}/api/templates/featured`, { cache: 'no-store' })
-    const data = await res.json()
-    return data.data || []
-  } catch { return [] }
-}
-
-async function getCategories(): Promise<Category[]> {
-  try {
-    const res = await fetch(`${API_URL}/api/categories`, { cache: 'no-store' })
-    if (!res.ok) return []
-    const data = await res.json()
-    return Array.isArray(data) ? data : (data.data || [])
-  } catch { return [] }
-}
-
-async function getNewArrivals(): Promise<TemplateListItem[]> {
-  try {
-    const res = await fetch(`${API_URL}/api/templates?sort=newest&per_page=4`, { cache: 'no-store' })
-    const data = await res.json()
-    return data.data || []
-  } catch { return [] }
-}
-
-async function getTopReviews(): Promise<{ name: string; text: string; rating: number; template_title?: string }[]> {
-  try {
-    const res = await fetch(`${API_URL}/api/reviews?sort=best&per_page=3&status=approved`, { cache: 'no-store' })
-    const data = await res.json()
-    return data.data || []
-  } catch { return [] }
-}
-
 export default async function HomePage() {
   const [templates, categories, newArrivals, reviews] = await Promise.all([
-    getFeaturedTemplates(), getCategories(), getNewArrivals(), getTopReviews(),
+    apiFetchData<TemplateListItem>('/api/templates/featured'),
+    apiFetchData<Category>('/api/categories'),
+    apiFetchData<TemplateListItem>('/api/templates?sort=newest&per_page=4'),
+    apiFetchData('/api/reviews?sort=best&per_page=3&status=approved'),
   ])
 
   return (

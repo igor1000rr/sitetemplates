@@ -1,18 +1,14 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Metadata } from 'next'
-
-const API_URL = process.env.API_URL || 'http://localhost:8000'
+import { apiFetch } from '@/lib/server-fetch'
 
 interface Props { params: { slug: string } }
 
 async function getAuthor(slug: string) {
-  try {
-    const res = await fetch(`${API_URL}/api/authors/${slug}`, { cache: 'no-store' })
-    if (!res.ok) return null
-    const data = await res.json()
-    return data.data || data || null
-  } catch { return null }
+  const data = await apiFetch(`/api/authors/${slug}`, null)
+  if (!data) return null
+  return data.data || data || null
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

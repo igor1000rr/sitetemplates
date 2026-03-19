@@ -22,7 +22,7 @@ class WelcomeNotification extends Notification implements ShouldQueue
         $count = Template::published()->count();
 
         return (new MailMessage)
-            ->subject('Добро пожаловать в TemplateName!')
+            ->subject('Добро пожаловать в AITempl!')
             ->view('emails.welcome', [
                 'name' => $notifiable->name,
                 'templatesCount' => $count,

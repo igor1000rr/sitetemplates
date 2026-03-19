@@ -1,4 +1,4 @@
-const CACHE_NAME = 'templatename-v1'
+const CACHE_NAME = 'aitempl-v1'
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',

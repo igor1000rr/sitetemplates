@@ -2,7 +2,10 @@ const API_URL = process.env.API_URL || 'http://localhost:8000'
 
 export async function GET() {
   try {
-    const res = await fetch(`${API_URL}/api/sitemap.xml`, { next: { revalidate: 3600 } })
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 5000)
+    const res = await fetch(`${API_URL}/api/sitemap.xml`, { next: { revalidate: 3600 }, signal: controller.signal })
+    clearTimeout(timer)
     const xml = await res.text()
     return new Response(xml, {
       headers: { 'Content-Type': 'application/xml', 'Cache-Control': 'public, max-age=3600' },

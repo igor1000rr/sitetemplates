@@ -1,7 +1,7 @@
 {
-    "name": "templatename/api",
+    "name": "aitempl/api",
     "type": "project",
-    "description": "TemplateName Marketplace API",
+    "description": "AITempl Marketplace API",
     "require": {
         "php": "^8.2",
         "laravel/framework": "^11.0",

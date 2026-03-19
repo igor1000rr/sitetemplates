@@ -38,7 +38,7 @@ const sections = [
       },
       {
         q: 'Можно ли вернуть деньги?',
-        a: 'Да, в течение 14 дней после покупки, если шаблон не был скачан. Напишите на support@templatename.ru.',
+        a: 'Да, в течение 14 дней после покупки, если шаблон не был скачан. Напишите на support@aitempl.ru.',
       },
       {
         q: 'Что если подписка закончится?',
@@ -148,7 +148,7 @@ export default function FaqPage() {
             <Link href="/contact" className="bg-accent text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-accent-dark transition">
               Написать нам
             </Link>
-            <a href="https://t.me/templatename_support" target="_blank" rel="noopener"
+            <a href="https://t.me/aitempl_support" target="_blank" rel="noopener"
               className="bg-white/[0.04] border border-white/[0.06] text-white/50 px-6 py-2.5 rounded-xl text-sm font-semibold hover:text-white/80 transition">
               Telegram
             </a>

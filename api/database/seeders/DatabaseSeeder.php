@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
         // ─── Admin ───
         User::create([
             'name' => 'Admin',
-            'email' => 'admin@templatename.ru',
+            'email' => 'admin@aitempl.ru',
             'password' => Hash::make('password'),
             'role' => 'admin',
             'email_verified_at' => now(),

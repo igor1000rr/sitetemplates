@@ -26,7 +26,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('panel')
             ->login()
-            ->brandName('TemplateName')
+            ->brandName('AITempl')
             ->colors([
                 'primary' => Color::Violet,
                 'danger' => Color::Rose,

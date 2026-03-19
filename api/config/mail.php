@@ -24,7 +24,7 @@ return [
     ],
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@templatename.ru'),
-        'name' => env('MAIL_FROM_NAME', 'TemplateName'),
+        'address' => env('MAIL_FROM_ADDRESS', 'hello@aitempl.ru'),
+        'name' => env('MAIL_FROM_NAME', 'AITempl'),
     ],
 ];

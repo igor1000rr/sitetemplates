@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
-export const alt = 'TemplateName — шаблоны сайтов для бизнеса'
+export const alt = 'AITempl — шаблоны сайтов для бизнеса'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -29,7 +29,7 @@ export default async function Image() {
         {/* Content */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative', zIndex: 1 }}>
           <div style={{ fontSize: 72, fontWeight: 800, color: '#ffffff', lineHeight: 1.1 }}>
-            TemplateName
+            AITempl
           </div>
           <div style={{ fontSize: 36, color: 'rgba(255,255,255,0.5)', lineHeight: 1.3 }}>
             Сайт для бизнеса за 3 минуты

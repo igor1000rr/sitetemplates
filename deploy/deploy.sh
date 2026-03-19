@@ -1,12 +1,12 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════
-# TemplateName — Deploy Script
+# AITempl — Deploy Script
 # Запуск: ./deploy.sh [setup|update|ssl|logs]
 # ═══════════════════════════════════════════════
 
 set -e
 
-PROJECT_DIR="/opt/templatename"
+PROJECT_DIR="/opt/aitempl"
 COMPOSE_FILE="$PROJECT_DIR/docker-compose.prod.yml"
 
 # Цвета
@@ -21,7 +21,7 @@ error() { echo -e "${RED}[✗]${NC} $1"; exit 1; }
 
 # ─── Первоначальная установка ───
 setup() {
-    log "Установка TemplateName..."
+    log "Установка AITempl..."
 
     # Зависимости
     if ! command -v docker &>/dev/null; then
@@ -36,16 +36,16 @@ setup() {
     fi
 
     # Структура
-    mkdir -p "$PROJECT_DIR"/{templatename-api,templatename-web,deploy/ssl}
+    mkdir -p "$PROJECT_DIR"/{aitempl-api,aitempl-web,deploy/ssl}
 
     log "Скопируй файлы проекта:"
-    echo "  scp templatename-api.zip server:$PROJECT_DIR/"
-    echo "  scp templatename-web.zip server:$PROJECT_DIR/"
+    echo "  scp aitempl-api.zip server:$PROJECT_DIR/"
+    echo "  scp aitempl-web.zip server:$PROJECT_DIR/"
     echo ""
     echo "Затем:"
     echo "  cd $PROJECT_DIR"
-    echo "  unzip templatename-api.zip -d templatename-api/"
-    echo "  unzip templatename-web.zip -d templatename-web/"
+    echo "  unzip aitempl-api.zip -d aitempl-api/"
+    echo "  unzip aitempl-web.zip -d aitempl-web/"
     echo "  cp deploy/.env.example .env"
     echo "  nano .env  # заполни все переменные"
     echo "  ./deploy.sh ssl  # получи SSL"
@@ -54,7 +54,7 @@ setup() {
 
 # ─── SSL через Let's Encrypt ───
 ssl() {
-    DOMAIN="${1:-DOMAIN.RU}"
+    DOMAIN="${1:-aitempl.ru}"
 
     log "Получение SSL для $DOMAIN..."
 
@@ -136,7 +136,7 @@ backup() {
 
     log "Backup базы данных..."
     docker compose -f docker-compose.prod.yml exec -T postgres \
-        pg_dump -U templatename templatename > "$BACKUP_DIR/$FILENAME"
+        pg_dump -U aitempl aitempl > "$BACKUP_DIR/$FILENAME"
 
     gzip "$BACKUP_DIR/$FILENAME"
     log "Сохранён: $BACKUP_DIR/${FILENAME}.gz"

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>@yield('subject', 'TemplateName')</title>
+<title>@yield('subject', 'AITempl')</title>
 <style>
   body { margin: 0; padding: 0; background: #07070f; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e2e2e8; }
   .wrapper { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
@@ -33,7 +33,7 @@
   <div class="header">
     <a href="{{ config('app.frontend_url') }}" class="logo">
       <span class="logo-icon">⚡</span>
-      Template<span class="accent">Name</span>
+      AI<span class="accent">Templ</span>
     </a>
   </div>
 
@@ -42,7 +42,7 @@
   </div>
 
   <div class="footer">
-    <p>© {{ date('Y') }} TemplateName. Все права защищены.</p>
+    <p>© {{ date('Y') }} AITempl. Все права защищены.</p>
     <p>
       <a href="{{ config('app.frontend_url') }}">Сайт</a> &nbsp;·&nbsp;
       <a href="{{ config('app.frontend_url') }}/templates">Каталог</a> &nbsp;·&nbsp;

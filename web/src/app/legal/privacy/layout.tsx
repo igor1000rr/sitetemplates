@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Конфиденциальность',
-  description: 'Политика конфиденциальности TemplateName.',
+  description: 'Политика конфиденциальности AITempl.',
 
 }
 
