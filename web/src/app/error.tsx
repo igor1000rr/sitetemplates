@@ -28,7 +28,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
           <Link href="/"
             className="bg-white/[0.04] border border-white/[0.06] text-white/50 px-6 py-2.5 rounded-xl text-sm font-semibold hover:text-white/80 transition">
             На главную
-          </a>
+          </Link>
         </div>
       </div>
     </main>

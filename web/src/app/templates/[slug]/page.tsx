@@ -92,7 +92,7 @@ export default async function TemplatePage({ params }: Props) {
           <span>/</span>
           <Link href="/templates" className="hover:text-white/50 transition">Каталог</Link>
           <span>/</span>
-          <a href={`/templates?category=${t.category.slug}`} className="hover:text-white/50 transition">{t.category.name}</Link>
+          <Link href={`/templates?category=${t.category.slug}`} className="hover:text-white/50 transition">{t.category.name}</Link>
           <span>/</span>
           <span className="text-white/40">{t.title}</span>
         </div>
@@ -291,7 +291,7 @@ export default async function TemplatePage({ params }: Props) {
             <h2 className="font-display text-xl font-bold mb-6">Похожие шаблоны</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
               {similar.map((s: any) => (
-                <a key={s.id} href={`/templates/${s.slug}`} className="group bg-bg-card rounded-xl overflow-hidden border border-white/[0.05] hover:border-accent/15 transition">
+                <Link key={s.id} href={`/templates/${s.slug}`} className="group bg-bg-card rounded-xl overflow-hidden border border-white/[0.05] hover:border-accent/15 transition">
                   <div className="bg-bg-surface pt-4 pb-1 px-3">
                     <LaptopFrame compact>
                       <div className="aspect-[16/10] overflow-hidden">
@@ -303,7 +303,7 @@ export default async function TemplatePage({ params }: Props) {
                     <h3 className="text-sm font-semibold leading-snug mb-2 line-clamp-2">{s.title}</h3>
                     <span className="text-accent-pale text-lg font-bold">{s.price_rub?.toLocaleString('ru-RU')} ₽</span>
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
           </section>
