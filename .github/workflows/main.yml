@@ -24,9 +24,6 @@ jobs:
             set -e
             cd /opt/sitetemplates
 
-            echo ">>> Update remote"
-            git remote set-url origin https://igor1000rr:${{ secrets.GIT_TOKEN }}@github.com/igor1000rr/sitetemplates.git
-
             echo ">>> Pull"
             git pull origin main
 
