@@ -7,6 +7,7 @@ const nextConfig = {
       { protocol: 'https', hostname: '*.s3.timeweb.cloud' },
       { protocol: 'https', hostname: '*.s3.amazonaws.com' },
       { protocol: 'https', hostname: 's3.timeweb.cloud' },
+      { protocol: 'https', hostname: 'aitempl.ru' },
       { protocol: 'http', hostname: 'localhost' },
     ],
     formats: ['image/avif', 'image/webp'],
