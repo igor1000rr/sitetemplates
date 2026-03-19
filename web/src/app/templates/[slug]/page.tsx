@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
 import AddToCartButton from '@/components/templates/AddToCartButton'
 import ServiceSelector from '@/components/templates/ServiceSelector'
 import ReviewForm from '@/components/templates/ReviewForm'
@@ -39,7 +40,7 @@ export default async function TemplatePage({ params }: Props) {
     return (
       <main className="min-h-screen pt-[80px] text-center">
         <h1 className="text-2xl font-bold mb-4">Шаблон не найден</h1>
-        <a href="/templates" className="text-accent-light">← Вернуться в каталог</a>
+        <Link href="/templates" className="text-accent-light">← Вернуться в каталог</Link>
       </main>
     )
   }
@@ -87,11 +88,11 @@ export default async function TemplatePage({ params }: Props) {
       <div className="max-w-[1200px] mx-auto px-8">
         {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-xs text-white/25 mb-8">
-          <a href="/" className="hover:text-white/50 transition">Главная</a>
+          <Link href="/" className="hover:text-white/50 transition">Главная</Link>
           <span>/</span>
-          <a href="/templates" className="hover:text-white/50 transition">Каталог</a>
+          <Link href="/templates" className="hover:text-white/50 transition">Каталог</Link>
           <span>/</span>
-          <a href={`/templates?category=${t.category.slug}`} className="hover:text-white/50 transition">{t.category.name}</a>
+          <a href={`/templates?category=${t.category.slug}`} className="hover:text-white/50 transition">{t.category.name}</Link>
           <span>/</span>
           <span className="text-white/40">{t.title}</span>
         </div>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import type { TemplateListItem, Category } from '@/types'
+import Link from 'next/link'
 import HeroSearch from '@/components/home/HeroSearch'
 import TemplateCard from '@/components/templates/TemplateCard'
 import { apiFetchData } from '@/lib/server-fetch'
@@ -50,10 +51,10 @@ export default async function HomePage() {
 
           {/* AI-подбор кнопка */}
           <div className="mt-6 flex justify-center">
-            <a href="/ai-match"
+            <Link href="/ai-match"
               className="inline-flex items-center gap-2 bg-white/[0.03] border border-accent/15 text-accent-pale/80 px-5 py-2 rounded-full text-[12px] font-medium hover:bg-accent/[0.06] transition">
               <span>✨</span> Не знаете что выбрать? AI подберёт за 30 секунд
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -101,7 +102,7 @@ export default async function HomePage() {
       <section className="max-w-[1300px] mx-auto px-8 mb-12">
         <div className="flex gap-2.5 overflow-x-auto pb-2">
           {categories.map((cat) => (
-            <a
+            <Link
               key={cat.id}
               href={`/templates?category=${cat.slug}`}
               className="min-w-[155px] h-[100px] rounded-[14px] p-4 bg-bg-surface border border-white/[0.05] flex flex-col justify-between hover:border-accent/20 transition shrink-0"
@@ -114,7 +115,7 @@ export default async function HomePage() {
                 </span>
               )}
               <span className="text-[12.5px] font-semibold text-white/65">{cat.name}</span>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -141,7 +142,7 @@ export default async function HomePage() {
             <p className="text-accent-light text-[11px] font-bold tracking-[2px] uppercase mb-2">Каталог</p>
             <h2 className="font-display text-[28px] font-bold tracking-tight">Популярные шаблоны</h2>
           </div>
-          <a href="/templates" className="text-white/30 text-sm hover:text-accent-light transition">Все шаблоны →</a>
+          <Link href="/templates" className="text-white/30 text-sm hover:text-accent-light transition">Все шаблоны →</Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 animate-stagger">
@@ -151,9 +152,9 @@ export default async function HomePage() {
         </div>
 
         <div className="text-center mt-12">
-          <a href="/templates" className="inline-flex items-center gap-2 bg-accent text-white px-11 py-3.5 rounded-xl text-sm font-bold hover:bg-accent-dark transition">
+          <Link href="/templates" className="inline-flex items-center gap-2 bg-accent text-white px-11 py-3.5 rounded-xl text-sm font-bold hover:bg-accent-dark transition">
             Все 326 шаблонов →
-          </a>
+          </Link>
         </div>
       </section>
 
@@ -165,7 +166,7 @@ export default async function HomePage() {
               <p className="text-green-400/80 text-[11px] font-bold tracking-[2px] uppercase mb-2">Новинки</p>
               <h2 className="font-display text-[28px] font-bold tracking-tight">Только что добавлены</h2>
             </div>
-            <a href="/templates?sort=newest" className="text-white/30 text-sm hover:text-accent-light transition">Все новинки →</a>
+            <Link href="/templates?sort=newest" className="text-white/30 text-sm hover:text-accent-light transition">Все новинки →</Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
             {newArrivals.map((t) => (
@@ -263,9 +264,9 @@ export default async function HomePage() {
                   </div>
                 ))}
               </div>
-              <a href="/pricing" className={`block w-full py-3 rounded-xl text-sm font-bold transition text-center ${p.popular ? 'bg-accent hover:bg-accent-dark text-white' : 'bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white/80'}`}>
+              <Link href="/pricing" className={`block w-full py-3 rounded-xl text-sm font-bold transition text-center ${p.popular ? 'bg-accent hover:bg-accent-dark text-white' : 'bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white/80'}`}>
                 Выбрать
-              </a>
+              </Link>
             </div>
           ))}
         </div>
@@ -279,12 +280,12 @@ export default async function HomePage() {
             Пока вы думаете — ваши конкуренты уже запустили сайт и получают клиентов. AI подберёт шаблон за 30 секунд.
           </p>
           <div className="flex gap-3 justify-center flex-wrap">
-            <a href="/ai-match" className="inline-flex bg-accent text-white px-10 py-3.5 rounded-xl text-sm font-bold hover:bg-accent-dark transition">
+            <Link href="/ai-match" className="inline-flex bg-accent text-white px-10 py-3.5 rounded-xl text-sm font-bold hover:bg-accent-dark transition">
               ✨ AI подберёт шаблон →
-            </a>
-            <a href="/templates" className="inline-flex bg-white/[0.04] border border-white/[0.06] text-white/50 px-6 py-3.5 rounded-xl text-sm font-semibold hover:text-white/80 transition">
+            </Link>
+            <Link href="/templates" className="inline-flex bg-white/[0.04] border border-white/[0.06] text-white/50 px-6 py-3.5 rounded-xl text-sm font-semibold hover:text-white/80 transition">
               Весь каталог
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -298,9 +299,9 @@ export default async function HomePage() {
             </h3>
             <p className="text-white/25 text-sm">Загружайте шаблоны, получайте 70% с каждой продажи. Без ограничений.</p>
           </div>
-          <a href="/author/register" className="bg-white/[0.04] border border-white/[0.06] text-white/50 px-6 py-2.5 rounded-xl text-sm font-semibold hover:text-white/80 transition shrink-0">
+          <Link href="/author/register" className="bg-white/[0.04] border border-white/[0.06] text-white/50 px-6 py-2.5 rounded-xl text-sm font-semibold hover:text-white/80 transition shrink-0">
             Стать автором
-          </a>
+          </Link>
         </div>
       </section>
     </main>
