@@ -35,11 +35,11 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->darkMode(true, true)
             ->navigationGroups([
-                NavigationGroup::make('Каталог')->icon('heroicon-o-squares-2x2'),
-                NavigationGroup::make('Продажи')->icon('heroicon-o-banknotes'),
-                NavigationGroup::make('Контент')->icon('heroicon-o-document-text'),
-                NavigationGroup::make('Пользователи')->icon('heroicon-o-users'),
-                NavigationGroup::make('Настройки')->icon('heroicon-o-cog-6-tooth'),
+                NavigationGroup::make('Каталог'),
+                NavigationGroup::make('Продажи'),
+                NavigationGroup::make('Контент'),
+                NavigationGroup::make('Пользователи'),
+                NavigationGroup::make('Настройки'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
