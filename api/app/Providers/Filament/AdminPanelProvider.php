@@ -27,19 +27,31 @@ class AdminPanelProvider extends PanelProvider
             ->path('panel')
             ->login()
             ->brandName('AITempl')
+            ->favicon('/favicon.svg')
             ->colors([
                 'primary' => Color::Violet,
                 'danger' => Color::Rose,
                 'success' => Color::Emerald,
                 'warning' => Color::Amber,
+                'info' => Color::Sky,
+                'gray' => Color::Zinc,
             ])
             ->darkMode(true, true)
+            ->sidebarCollapsibleOnDesktop()
+            ->sidebarWidth('17rem')
+            ->maxContentWidth('full')
+            ->globalSearch(true)
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            ->globalSearchFieldSuffix('⌘K')
+            ->breadcrumbs(true)
+            ->databaseNotifications()
             ->navigationGroups([
-                NavigationGroup::make('Каталог'),
-                NavigationGroup::make('Продажи'),
-                NavigationGroup::make('Контент'),
-                NavigationGroup::make('Пользователи'),
-                NavigationGroup::make('Настройки'),
+                NavigationGroup::make('Каталог')->collapsible(),
+                NavigationGroup::make('Продажи')->collapsible(),
+                NavigationGroup::make('Контент')->collapsible(),
+                NavigationGroup::make('Маркетинг')->collapsible(),
+                NavigationGroup::make('Пользователи')->collapsible(),
+                NavigationGroup::make('Настройки')->collapsible(),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
