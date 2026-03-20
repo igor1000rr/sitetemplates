@@ -12,10 +12,11 @@ class PaymentService
     public function __construct()
     {
         $this->client = new Client();
-        $this->client->setAuth(
-            config('yukassa.shop_id'),
-            config('yukassa.secret_key')
-        );
+        $shopId = config('yukassa.shop_id');
+        $secretKey = config('yukassa.secret_key');
+        if ($shopId && $secretKey) {
+            $this->client->setAuth((int) $shopId, $secretKey);
+        }
     }
 
     /**
