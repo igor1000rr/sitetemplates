@@ -97,7 +97,7 @@ export default function EmailCapture() {
               </button>
             </form>
             <p className="text-white/10 text-[10px] mt-2">
-              Без спама. Отписка в один клик. <a href="/legal/privacy" target="_blank" className="text-white/20 hover:text-white/30">Политика конфиденциальности</a>
+              Без спама. Отписка в один клик. <a href="/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-white/20 hover:text-white/30">Политика конфиденциальности</a>
             </p>
           </>
         )}

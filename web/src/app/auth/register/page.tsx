@@ -91,9 +91,9 @@ export default function RegisterPage() {
             />
             <span className="text-white/30 text-xs leading-relaxed group-hover:text-white/40 transition">
               Я соглашаюсь с{' '}
-              <Link href="/legal/terms" target="_blank" className="text-accent-light/60 hover:text-accent-light">публичной офертой</Link>{' '}
+              <Link href="/legal/terms" target="_blank" rel="noopener noreferrer" className="text-accent-light/60 hover:text-accent-light">публичной офертой</Link>{' '}
               и{' '}
-              <Link href="/legal/privacy" target="_blank" className="text-accent-light/60 hover:text-accent-light">политикой конфиденциальности</Link>,
+              <Link href="/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-accent-light/60 hover:text-accent-light">политикой конфиденциальности</Link>,
               {' '}даю согласие на обработку персональных данных
             </span>
           </label>

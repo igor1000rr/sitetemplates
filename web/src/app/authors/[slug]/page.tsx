@@ -68,10 +68,10 @@ export default async function AuthorPublicProfile({ params }: Props) {
             {author.social_links && (
               <div className="flex gap-3 mt-2">
                 {author.social_links.telegram && (
-                  <a href={`https://t.me/${author.social_links.telegram.replace('@', '')}`} target="_blank" className="text-white/15 hover:text-white/40 transition text-xs">Telegram</a>
+                  <a href={`https://t.me/${author.social_links.telegram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-white/15 hover:text-white/40 transition text-xs">Telegram</a>
                 )}
                 {author.social_links.vk && (
-                  <a href={author.social_links.vk} target="_blank" className="text-white/15 hover:text-white/40 transition text-xs">VK</a>
+                  <a href={author.social_links.vk} target="_blank" rel="noopener noreferrer" className="text-white/15 hover:text-white/40 transition text-xs">VK</a>
                 )}
               </div>
             )}

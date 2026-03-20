@@ -101,7 +101,7 @@ export default function ContactPage() {
                   className="mt-0.5 w-4 h-4 rounded border border-white/[0.12] bg-white/[0.03] accent-accent flex-shrink-0" />
                 <span className="text-white/30 text-xs leading-relaxed group-hover:text-white/40 transition">
                   Даю согласие на обработку персональных данных в соответствии с{' '}
-                  <Link href="/legal/privacy" target="_blank" className="text-accent-light/60 hover:text-accent-light">политикой конфиденциальности</Link>
+                  <Link href="/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-accent-light/60 hover:text-accent-light">политикой конфиденциальности</Link>
                 </span>
               </label>
 

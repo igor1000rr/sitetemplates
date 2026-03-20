@@ -64,7 +64,7 @@ export default function AdminEditPost() {
         <h2 className="text-lg font-bold">Редактировать статью</h2>
         <div className="flex gap-2">
           {form.status === 'published' && (
-            <Link href={`/blog/${form.slug}`} target="_blank" className="text-white/25 hover:text-white/50 text-xs px-3 py-2 transition">Просмотр ↗</Link>
+            <Link href={`/blog/${form.slug}`} target="_blank" rel="noopener noreferrer" className="text-white/25 hover:text-white/50 text-xs px-3 py-2 transition">Просмотр ↗</Link>
           )}
           <button onClick={() => save('draft')} disabled={saving}
             className="bg-white/[0.05] text-white/50 px-4 py-2 rounded-xl text-sm hover:bg-white/[0.08] transition disabled:opacity-50">Черновик</button>
