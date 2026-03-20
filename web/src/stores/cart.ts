@@ -82,7 +82,7 @@ export const useCart = create<CartStore>()(
       },
     }),
     {
-      name: 'tn-cart',
+      name: 'aitempl-cart',
     }
   )
 )
