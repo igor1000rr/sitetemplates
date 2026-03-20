@@ -44,7 +44,6 @@ class AdminPanelProvider extends PanelProvider
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->globalSearchFieldSuffix('⌘K')
             ->breadcrumbs(true)
-            ->databaseNotifications()
             ->navigationGroups([
                 NavigationGroup::make('Каталог')->collapsible(),
                 NavigationGroup::make('Продажи')->collapsible(),
