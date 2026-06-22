@@ -42,7 +42,8 @@ class AuthorRegisterController extends Controller
             'commission' => 70, // 70% автору по умолчанию
         ]);
 
-        $user->update(['role' => 'author']);
+        // role не входит в $fillable (защита от mass-assignment) — задаём явно
+        $user->forceFill(['role' => 'author'])->save();
 
         return response()->json([
             'message' => 'Вы зарегистрированы как автор!',

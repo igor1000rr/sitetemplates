@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\WelcomeNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
@@ -79,11 +80,31 @@ class SocialAuthController extends Controller
             } catch (\Exception $e) {}
         }
 
-        // Генерируем токен
+        // Генерируем токен. Отдаём его НЕ в URL, а по одноразовому коду обмена —
+        // токен в query-строке утекает в логи сервера, историю браузера и Referer.
         $token = $user->createToken('auth-token')->plainTextToken;
 
-        // Редирект на фронт с токеном
+        $code = Str::random(64);
+        Cache::put("social_auth:{$code}", $token, now()->addMinutes(2));
+
         $frontUrl = config('app.frontend_url', 'http://localhost:3000');
-        return redirect($frontUrl . '/auth/callback?token=' . $token);
+        return redirect($frontUrl . '/auth/callback?code=' . $code);
+    }
+
+    /**
+     * POST /api/auth/social/exchange — обменять одноразовый код на токен.
+     * Код живёт 2 минуты и используется только один раз (Cache::pull).
+     */
+    public function exchange(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate(['code' => 'required|string|max:128']);
+
+        $token = Cache::pull("social_auth:{$data['code']}");
+
+        if (!$token) {
+            return response()->json(['message' => 'Код недействителен или истёк'], 422);
+        }
+
+        return response()->json(['token' => $token]);
     }
 }

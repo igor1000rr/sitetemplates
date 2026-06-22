@@ -60,7 +60,7 @@ class SystemHealth extends Page
         ];
 
         // YooKassa
-        $yooId = config('yukassa.shop_id');
+        $yooId = config('services.yookassa.shop_id');
         $checks[] = [
             'name' => 'ЮKassa',
             'status' => (bool) $yooId,

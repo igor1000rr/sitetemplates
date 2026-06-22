@@ -90,8 +90,8 @@ Route::get('/subscriptions/plans', [\App\Http\Controllers\SubscriptionController
 // Сравнение шаблонов (публичный)
 Route::get('/compare', [\App\Http\Controllers\CompareController::class, 'compare']);
 
-// AI-подбор шаблона (30 запросов/минуту на IP)
-Route::post('/ai/chat', [AiChatController::class, 'chat'])->middleware('throttle:30,1');
+// AI-подбор шаблона (публичный, без авторизации) — ограничиваем расход OpenAI
+Route::post('/ai/chat', [AiChatController::class, 'chat'])->middleware('throttle:20,1');
 
 // Newsletter
 Route::post('/newsletter/subscribe', [\App\Http\Controllers\NewsletterController::class, 'subscribe'])->middleware('throttle:5,1');
@@ -106,6 +106,8 @@ Route::get('/live-purchases', [\App\Http\Controllers\LivePurchaseController::cla
 // Social Auth (OAuth)
 Route::get('/auth/social/{provider}', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirect']);
 Route::get('/auth/social/{provider}/callback', [\App\Http\Controllers\Auth\SocialAuthController::class, 'callback']);
+// Обмен одноразового кода (из колбэка) на токен — токен не передаётся через URL
+Route::post('/auth/social/exchange', [\App\Http\Controllers\Auth\SocialAuthController::class, 'exchange'])->middleware('throttle:10,1');
 
 // Публичный профиль автора
 Route::get('/authors/{slug}', [\App\Http\Controllers\Author\AuthorProfileController::class, 'publicProfile']);

@@ -31,7 +31,6 @@ return [
     'yookassa' => [
         'shop_id' => env('YUKASSA_SHOP_ID') ? (int) env('YUKASSA_SHOP_ID') : null,
         'secret_key' => env('YUKASSA_SECRET_KEY') ?: null,
-        'webhook_secret' => env('YUKASSA_WEBHOOK_SECRET') ?: null,
     ],
 
     'yandex' => [

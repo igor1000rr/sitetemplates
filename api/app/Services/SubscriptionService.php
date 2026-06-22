@@ -16,8 +16,8 @@ class SubscriptionService
     public function __construct()
     {
         $this->client = new Client();
-        $shopId = config('yukassa.shop_id');
-        $secretKey = config('yukassa.secret_key');
+        $shopId = config('services.yookassa.shop_id');
+        $secretKey = config('services.yookassa.secret_key');
         if ($shopId && $secretKey) {
             $this->client->setAuth((int) $shopId, $secretKey);
         }

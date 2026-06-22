@@ -13,9 +13,13 @@ class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    // Чувствительные поля (role, referral_balance, referral_total_earned) намеренно
+    // НЕ входят в $fillable — они задаются только из доверенного кода через forceFill()
+    // или increment(), но никогда из пользовательского ввода (защита от mass-assignment).
     protected $fillable = [
-        'email', 'password', 'name', 'phone', 'role', 'avatar',
-        'referral_code', 'referred_by', 'referral_balance', 'referral_total_earned',
+        'email', 'password', 'name', 'phone', 'avatar',
+        'referral_code', 'referred_by',
+        'social_provider', 'social_id', 'email_verified_at',
     ];
 
     protected $hidden = [

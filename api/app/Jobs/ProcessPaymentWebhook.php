@@ -27,16 +27,45 @@ class ProcessPaymentWebhook implements ShouldQueue
 
     public function handle(TelegramService $telegram): void
     {
+        $event = $this->data['event'] ?? null;
         $object = $this->data['object'] ?? [];
         $paymentId = $object['id'] ?? null;
-        $status = $object['status'] ?? null;
 
-        if (!$paymentId || !$status) {
-            Log::warning('ProcessPaymentWebhook: missing payment_id or status', $this->data);
+        if (!$event || !$paymentId) {
+            Log::warning('ProcessPaymentWebhook: missing event or object id', $this->data);
             return;
         }
 
-        // Проверяем — это подписка или заказ?
+        // ─── Возврат: объект — это refund, исходный платёж лежит в payment_id ───
+        if ($event === 'refund.succeeded') {
+            $relatedPaymentId = $object['payment_id'] ?? null;
+            if (!$relatedPaymentId) {
+                Log::warning('ProcessPaymentWebhook: refund without payment_id', $this->data);
+                return;
+            }
+
+            $order = Order::where('payment_id', $relatedPaymentId)
+                ->with(['items.template'])
+                ->first();
+
+            if (!$order) {
+                Log::error("ProcessPaymentWebhook: order not found for refunded payment {$relatedPaymentId}");
+                return;
+            }
+
+            $this->handleRefund($order);
+            return;
+        }
+
+        // ─── Платёжные события: никогда не доверяем статусу из тела запроса ───
+        $status = $this->verifyStatus($paymentId, $object['status'] ?? null);
+        if ($status === null) {
+            Log::warning("ProcessPaymentWebhook: could not verify payment {$paymentId} via API, retrying");
+            $this->release(30);
+            return;
+        }
+
+        // Подписка или обычный заказ?
         $metadata = $object['metadata'] ?? [];
         $type = $metadata['type'] ?? 'order';
 
@@ -51,7 +80,6 @@ class ProcessPaymentWebhook implements ShouldQueue
             return;
         }
 
-        // Обычный заказ
         $order = Order::where('payment_id', $paymentId)
             ->with(['user', 'items.template'])
             ->first();
@@ -64,9 +92,23 @@ class ProcessPaymentWebhook implements ShouldQueue
         match ($status) {
             'succeeded' => $this->handleSuccess($order, $telegram),
             'canceled' => $this->handleCanceled($order),
-            'refunded' => $this->handleRefund($order),
             default => Log::info("ProcessPaymentWebhook: unhandled status {$status}"),
         };
+    }
+
+    /**
+     * Авторитетный статус платежа: перезапрашиваем его из API ЮKassa.
+     * Только если API не настроен (локальная разработка) — доверяем телу уведомления.
+     */
+    private function verifyStatus(string $paymentId, ?string $fallback): ?string
+    {
+        if (!config('services.yookassa.shop_id') || !config('services.yookassa.secret_key')) {
+            return $fallback;
+        }
+
+        $payment = app(\App\Services\PaymentService::class)->getPayment($paymentId);
+
+        return $payment?->getStatus();
     }
 
     private function handleSuccess(Order $order, TelegramService $telegram): void

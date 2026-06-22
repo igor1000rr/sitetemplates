@@ -9,6 +9,7 @@ use App\Models\Template;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -133,12 +134,16 @@ class OrderController extends Controller
             app(\App\Services\TelegramService::class)->notifyNewOrder(
                 $order->load(['user', 'items.template'])
             );
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            Log::warning("Telegram notifyNewOrder failed for order {$order->order_number}: {$e->getMessage()}");
+        }
 
         // Email — подтверждение заказа
         try {
             $order->user->notify(new \App\Notifications\OrderCreatedNotification($order));
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            Log::warning("OrderCreated email failed for order {$order->order_number}: {$e->getMessage()}");
+        }
 
         return response()->json([
             'order' => new OrderResource($order->load('items.template')),

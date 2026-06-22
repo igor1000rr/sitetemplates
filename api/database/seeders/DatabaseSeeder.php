@@ -16,13 +16,24 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // ─── Admin ───
-        User::create([
+        // Никаких дефолтных паролей: учётные данные берутся из окружения.
+        // Если ADMIN_PASSWORD не задан — генерируем случайный и выводим один раз.
+        $adminEmail = env('ADMIN_EMAIL', 'admin@aitempl.ru');
+        $adminPassword = env('ADMIN_PASSWORD');
+        if (!$adminPassword) {
+            $adminPassword = Str::password(20);
+            $this->command?->warn("Сгенерирован пароль администратора ({$adminEmail}): {$adminPassword}");
+            $this->command?->warn('Сохраните его и смените пароль после первого входа.');
+        }
+
+        $admin = User::create([
             'name' => 'Admin',
-            'email' => 'admin@aitempl.ru',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
+            'email' => $adminEmail,
+            'password' => Hash::make($adminPassword),
             'email_verified_at' => now(),
         ]);
+        // role не входит в $fillable — задаём явно
+        $admin->forceFill(['role' => 'admin'])->save();
 
         // ─── Платформы ───
         $wp = Platform::create(['name' => 'WordPress', 'slug' => 'wordpress']);
