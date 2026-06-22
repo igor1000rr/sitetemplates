@@ -67,7 +67,7 @@ class ProcessDeployment implements ShouldQueue
             $d->appendLog("Деплой завершён успешно!");
             $d->markCompleted();
 
-            \App\Models\Notification::push(
+            \App\Models\Notification::pushNotification(
                 $d->user_id, 'deploy', 'Шаблон установлен',
                 "Шаблон успешно установлен на {$d->host}",
                 '/account'
@@ -78,7 +78,7 @@ class ProcessDeployment implements ShouldQueue
             $d->appendLog("ОШИБКА: {$e->getMessage()}");
             $d->markFailed($e->getMessage());
 
-            \App\Models\Notification::push(
+            \App\Models\Notification::pushNotification(
                 $d->user_id, 'deploy', 'Ошибка установки',
                 "Не удалось установить шаблон: {$e->getMessage()}",
                 '/account'

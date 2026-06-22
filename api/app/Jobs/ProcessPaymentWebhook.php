@@ -160,7 +160,7 @@ class ProcessPaymentWebhook implements ShouldQueue
 
         // In-app уведомление
         try {
-            \App\Models\Notification::push(
+            \App\Models\Notification::pushNotification(
                 $order->user_id,
                 'order_paid',
                 'Заказ оплачен',

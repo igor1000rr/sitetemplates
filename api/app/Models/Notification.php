@@ -28,7 +28,7 @@ class Notification extends Model
     /**
      * Создать уведомление для пользователя.
      */
-    public static function push(int $userId, string $type, string $title, string $message, ?string $link = null): self
+    public static function pushNotification(int $userId, string $type, string $title, string $message, ?string $link = null): self
     {
         return static::create([
             'user_id' => $userId,
