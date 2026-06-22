@@ -141,12 +141,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/orders/find/{orderNumber}', [OrderController::class, 'findByNumber']);
     Route::get('/orders/{order}', [OrderController::class, 'show']);
 
-    // Скачивание (по заказу)
-    Route::get('/download/{order}/{template}', [DownloadController::class, 'download']);
     // Скачивание (по подписке)
     Route::get('/download/subscription/{template}', [DownloadController::class, 'downloadBySubscription']);
     // Проверка доступа
     Route::get('/download/check/{template}', [DownloadController::class, 'checkAccess']);
+    // Скачивание (по заказу) — generic-роут регистрируем последним,
+    // иначе он перехватывает /download/subscription и /download/check
+    Route::get('/download/{order}/{template}', [DownloadController::class, 'download']);
 
     // Избранное
     Route::get('/wishlist', [\App\Http\Controllers\WishlistController::class, 'index']);
