@@ -9,14 +9,43 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ─── Тесты: гейт перед деплоем ───
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install dependencies
+        working-directory: api
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare env
+        working-directory: api
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Run tests
+        working-directory: api
+        run: php artisan test
+
+  # ─── Деплой (только если тесты прошли) ───
   deploy:
+    needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
-          host: 147.45.155.40
+          host: ${{ secrets.DEPLOY_HOST }}
           username: root
           key: ${{ secrets.SSH_KEY }}
           command_timeout: 12m
@@ -31,7 +60,7 @@ jobs:
             cp deploy/docker-compose.prod.yml docker-compose.yml
 
             echo ">>> Build"
-            docker compose build --no-cache
+            docker compose build
 
             echo ">>> Deploy"
             docker compose up -d
