@@ -139,11 +139,11 @@ jobs:
               exit 1
             fi
 
-            echo ">>> TLS: renewal-hooks + продление при необходимости"
-            # Причина прошлой просрочки: авто-renew в режиме standalone конфликтовал с
-            # nginx на :80 и молча падал. Ставим renewal-hooks (их использует и
-            # systemd-таймер certbot, и ручной renew) — они останавливают/запускают
-            # nginx вокруг продления. На свежем серте renew — no-op без даунтайма.
+            echo ">>> TLS: проверка серта + выпуск/продление при необходимости"
+            # certbot renew не помогает, если на сервере нет renewal-конфига (состояние
+            # LE потеряно). Поэтому проверяем РЕАЛЬНЫЙ серт из deploy/ssl и при истечении
+            # выпускаем заново через certonly --standalone (создаёт и renewal-конфиг).
+            # renewal-hooks нужны, чтобы systemd-таймер certbot потом продлевал без 502.
             if ! command -v certbot >/dev/null 2>&1; then
               apt-get update -qq && apt-get install -y -qq certbot || true
             fi
@@ -151,7 +151,21 @@ jobs:
             printf '#!/bin/sh\ncd /opt/sitetemplates && docker compose stop nginx\n' > /etc/letsencrypt/renewal-hooks/pre/stop-nginx.sh
             printf '#!/bin/sh\ncd /opt/sitetemplates && cp /etc/letsencrypt/live/aitempl.ru/*.pem deploy/ssl/ 2>/dev/null || true; docker compose up -d nginx\n' > /etc/letsencrypt/renewal-hooks/post/start-nginx.sh
             chmod +x /etc/letsencrypt/renewal-hooks/pre/stop-nginx.sh /etc/letsencrypt/renewal-hooks/post/start-nginx.sh
-            certbot renew --non-interactive --quiet && echo "✅ TLS renew OK" || echo "⚠️  certbot renew не сработал — проверить вручную"
-            docker compose up -d nginx || true
+            # Выпуск только если серта нет или истекает в ближайшие 7 дней (иначе no-op без даунтайма).
+            if ! openssl x509 -checkend 604800 -noout -in deploy/ssl/fullchain.pem >/dev/null 2>&1; then
+              echo ">>> Серт истёк/скоро истечёт — выпускаю заново (освобождаю :80 от nginx)"
+              docker compose stop nginx || true
+              if certbot certonly --standalone --non-interactive --agree-tos \
+                   --email admin@aitempl.ru -d aitempl.ru -d www.aitempl.ru --force-renewal; then
+                cp /etc/letsencrypt/live/aitempl.ru/fullchain.pem deploy/ssl/ || true
+                cp /etc/letsencrypt/live/aitempl.ru/privkey.pem deploy/ssl/ || true
+                echo "✅ TLS-сертификат выпущен"
+              else
+                echo "⚠️  Выпуск TLS не удался — проверить вручную"
+              fi
+              docker compose up -d nginx || true
+            else
+              echo "✅ TLS-сертификат ещё действителен (>7 дней) — пропускаю"
+            fi
 
             echo "✅ Deploy successful at $(date)"
