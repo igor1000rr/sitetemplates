@@ -75,17 +75,21 @@ jobs:
         uses: appleboy/ssh-action@v1
         env:
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: root
           key: ${{ secrets.SSH_KEY }}
           command_timeout: 12m
-          envs: REDIS_PASSWORD
+          envs: REDIS_PASSWORD,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY
           script: |
             set -e
-            # REDIS_PASSWORD прокидываем из GitHub secret, чтобы docker compose
-            # не зависел от наличия переменной в server .env
+            # Секреты прокидываем из GitHub Secrets, чтобы docker compose не зависел
+            # от наличия переменных в server .env (api+redis+S3 получают значения).
             export REDIS_PASSWORD="$REDIS_PASSWORD"
+            export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID"
+            export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY"
             cd /opt/sitetemplates
 
             echo ">>> Pull"

@@ -64,6 +64,11 @@ services:
       CACHE_STORE: redis
       QUEUE_CONNECTION: redis
       SESSION_DRIVER: redis
+      # S3 (Timeweb): ключи прокидываются из GitHub Secrets через деплой,
+      # чтобы не держать их в server .env. path-style=true — как в .env.example.
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_USE_PATH_STYLE_ENDPOINT: "true"
     volumes:
       - api_storage:/var/www/html/storage/app
     healthcheck:
