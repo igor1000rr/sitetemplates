@@ -44,6 +44,29 @@
 
 ---
 
+## 📍 Где брать ключи (инструкция владельцу)
+
+Все сразу не нужны. Минимум для старта продаж — **S3** + **ЮKassa**.
+
+| Сервис | Где взять | Что получите |
+|---|---|---|
+| **S3 (Timeweb)** | timeweb.cloud → Облачное хранилище S3 → создать/открыть бакет → «Ключи доступа» | Access Key ID, Secret Key, имя бакета |
+| **ЮKassa** | yookassa.ru → личный кабинет → Настройки / Интеграция | shopId, секретный ключ |
+| **Telegram** | @BotFather → `/newbot` (токен); написать @userinfobot (ваш chat_id) | bot token, admin chat_id |
+| **Почта** | ящик на домене через Яндекс 360 → Яндекс ID → Безопасность → Пароли приложений | email + пароль приложения |
+| **OpenAI** | platform.openai.com → API keys → Create secret key | api key |
+| **OAuth Google** | console.cloud.google.com → новый проект → Credentials → OAuth client (тип Web) | client id + secret |
+| **OAuth Яндекс** | oauth.yandex.ru → зарегистрировать приложение | client id + secret |
+| **Метрика / GA** | metrika.yandex.ru (номер счётчика); analytics.google.com (Measurement ID `G-…`) | YM_ID, GA_ID |
+
+Redirect URI для OAuth: `https://aitempl.ru/api/auth/google/callback` и `https://aitempl.ru/api/auth/yandex/callback`.
+Пароль почты — именно **пароль приложения**, не основной пароль аккаунта.
+
+**Приоритет:** 1) S3 + ЮKassa (продажи и выдача файлов) → 2) Telegram + Почта
+(уведомления и письма клиентам) → 3) OpenAI / OAuth / аналитика (можно после старта).
+
+---
+
 ## 🟢 Сделано без ключей (в ветке, активируется на деплое)
 - [x] Проводка инжекта ключей S3 из GitHub Secrets + `use_path_style=true` (`3c8fd33`);
 - [x] Аналитика: `NEXT_PUBLIC_*` переданы как **build-args** в `web/Dockerfile` + compose
