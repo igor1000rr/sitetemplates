@@ -69,6 +69,14 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
       AWS_USE_PATH_STYLE_ENDPOINT: "true"
+      # Почта: Resend по SMTP. Несекретные настройки форсируем здесь (перекрывают
+      # устаревший server .env), API-ключ инжектится из GitHub Secret RESEND_API_KEY.
+      MAIL_MAILER: smtp
+      MAIL_HOST: smtp.resend.com
+      MAIL_PORT: "587"
+      MAIL_USERNAME: resend
+      MAIL_ENCRYPTION: tls
+      MAIL_PASSWORD: ${RESEND_API_KEY:-}
     volumes:
       - api_storage:/var/www/html/storage/app
     healthcheck:

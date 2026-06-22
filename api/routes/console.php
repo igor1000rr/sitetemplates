@@ -40,7 +40,7 @@ Artisan::command('diag:launch', function () {
     $this->line('── Интеграции (SET/EMPTY) ──');
     $this->line('yookassa: shop_id='.$mask(config('services.yookassa.shop_id')).' secret='.$mask(config('services.yookassa.secret_key')));
     $this->line('telegram: bot_token='.$mask(config('services.telegram.bot_token')).' admin_chat_id='.$mask(config('services.telegram.admin_chat_id')));
-    $this->line('mail: username='.$mask(config('mail.mailers.smtp.username')).' password='.$mask(config('mail.mailers.smtp.password')));
+    $this->line('mail: host='.config('mail.mailers.smtp.host').' password='.$mask(config('mail.mailers.smtp.password')));
     $this->line('openai: api_key='.$mask(config('services.openai.api_key')));
     $this->line('google: client_id='.$mask(config('services.google.client_id')).' secret='.$mask(config('services.google.client_secret')));
     $this->line('yandex: client_id='.$mask(config('services.yandex.client_id')).' secret='.$mask(config('services.yandex.client_secret')));
