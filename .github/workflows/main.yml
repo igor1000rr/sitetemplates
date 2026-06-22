@@ -99,6 +99,10 @@ jobs:
 
             echo ">>> Deploy"
             docker compose up -d
+            # nginx читает конфиг и резолвит upstream'ы (api/web) только при старте.
+            # После пересоздания api/web их IP меняются → пересоздаём nginx последним,
+            # иначе он держит старые адреса и отдаёт 502; заодно подхватит новый nginx.conf.
+            docker compose up -d --force-recreate nginx
 
             echo ">>> Migrate"
             docker compose exec -T api php artisan migrate --force
