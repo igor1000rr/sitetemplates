@@ -79,6 +79,12 @@ Redirect URI для OAuth: `https://aitempl.ru/api/auth/google/callback` и `htt
       SET/EMPTY, без вывода секретов);
 - [x] Почта переведена на **Resend** (SMTP): несекретные настройки в compose,
       `RESEND_API_KEY` инжектится из GitHub Secret; ждёт ключ от агентства.
+- [x] Прод-безопасность: `APP_ENV=production` + `APP_DEBUG=false` форсируются в
+      compose (защита от утечки стектрейсов), diag:launch показывает app env/debug.
+- [x] SEO: `/robots.txt` и `/sitemap.xml` отдаются nginx напрямую из API (без
+      хайрпина через web-контейнер); в sitemap добавлены маркетинговые страницы
+      (pricing, faq, contact, custom-development, legal); robots больше не блокирует
+      публичные профили `/authors/{slug}` (чинит prefix-match `/author`).
 
 ---
 

@@ -30,6 +30,12 @@ class SitemapController extends Controller
             ['loc' => '/', 'priority' => '1.0', 'changefreq' => 'daily'],
             ['loc' => '/templates', 'priority' => '0.9', 'changefreq' => 'daily'],
             ['loc' => '/blog', 'priority' => '0.8', 'changefreq' => 'daily'],
+            ['loc' => '/pricing', 'priority' => '0.7', 'changefreq' => 'weekly'],
+            ['loc' => '/custom-development', 'priority' => '0.7', 'changefreq' => 'monthly'],
+            ['loc' => '/faq', 'priority' => '0.5', 'changefreq' => 'monthly'],
+            ['loc' => '/contact', 'priority' => '0.5', 'changefreq' => 'monthly'],
+            ['loc' => '/legal/terms', 'priority' => '0.3', 'changefreq' => 'yearly'],
+            ['loc' => '/legal/privacy', 'priority' => '0.3', 'changefreq' => 'yearly'],
         ];
 
         foreach ($staticPages as $page) {
@@ -90,7 +96,10 @@ class SitemapController extends Controller
             'Disallow: /checkout',
             'Disallow: /auth',
             'Disallow: /admin',
-            'Disallow: /author',
+            // Приватный кабинет автора (/author и /author/*). С завершающим слешем
+            // и $-якорем, чтобы НЕ блокировать публичные профили /authors/{slug}.
+            'Disallow: /author/',
+            'Disallow: /author$',
             '',
             "Sitemap: {$siteUrl}/sitemap.xml",
             '',

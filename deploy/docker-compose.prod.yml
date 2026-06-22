@@ -64,6 +64,11 @@ services:
       CACHE_STORE: redis
       QUEUE_CONNECTION: redis
       SESSION_DRIVER: redis
+      # Прод-безопасность: фиксируем production + выключенный debug, чтобы стектрейсы
+      # и отладочная информация не утекали наружу, даже если в server .env осталось
+      # APP_DEBUG=true (env здесь имеет приоритет над env_file и попадает в config:cache).
+      APP_ENV: production
+      APP_DEBUG: "false"
       # S3 (Timeweb): ключи прокидываются из GitHub Secrets через деплой,
       # чтобы не держать их в server .env. path-style=true — как в .env.example.
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}

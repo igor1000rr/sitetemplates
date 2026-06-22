@@ -23,6 +23,9 @@ Schedule::job(new \App\Jobs\RenewSubscriptions)->dailyAt('06:00');
 Artisan::command('diag:launch', function () {
     $mask = fn ($v) => !empty($v) ? 'SET' : 'EMPTY';
 
+    $this->line('── App ──');
+    $this->line('env='.config('app.env').' debug='.(config('app.debug') ? 'TRUE ⚠️ (выключить в проде!)' : 'false').' frontend_url='.config('app.frontend_url'));
+
     $this->line('── S3 ──');
     $s3 = config('filesystems.disks.s3');
     $this->line('region='.($s3['region'] ?? ''));
