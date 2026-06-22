@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/stores/auth'
+import { authApi } from '@/lib/api'
 
 export default function AuthCallbackPage() {
   const searchParams = useSearchParams()
@@ -10,7 +11,7 @@ export default function AuthCallbackPage() {
   const { setToken, loadUser } = useAuth()
 
   useEffect(() => {
-    const token = searchParams.get('token')
+    const code = searchParams.get('code')
     const error = searchParams.get('error')
 
     if (error) {
@@ -18,16 +19,19 @@ export default function AuthCallbackPage() {
       return
     }
 
-    if (token) {
-      setToken(token)
-      loadUser().then(() => {
-        router.push('/account')
-      }).catch(() => {
-        router.push('/auth/login?error=auth_failed')
-      })
-    } else {
+    if (!code) {
       router.push('/auth/login')
+      return
     }
+
+    // Меняем одноразовый код на токен (токен больше не передаётся через URL)
+    authApi.socialExchange(code)
+      .then(({ data }) => {
+        setToken(data.token)
+        return loadUser()
+      })
+      .then(() => router.push('/account'))
+      .catch(() => router.push('/auth/login?error=auth_failed'))
   }, [searchParams])
 
   return (

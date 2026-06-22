@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { ArticleSchema, BreadcrumbSchema } from '@/components/seo/JsonLd'
 import { apiFetch } from '@/lib/server-fetch'
 import { sanitizeHtml } from '@/lib/sanitize'
+import { safeJsonLd } from '@/lib/jsonld'
 
 interface Props { params: { slug: string } }
 
@@ -65,7 +66,7 @@ export default async function BlogArticle({ params }: Props) {
 
   return (
     <main className="min-h-screen pt-[100px] pb-16">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(jsonLd) }} />
       <BreadcrumbSchema items={[
         { name: 'Главная', url: '/' },
         { name: 'Блог', url: '/blog' },

@@ -5,10 +5,12 @@ import type { User } from '@/types'
 // Sync cookie for middleware (server-side redirect check)
 function syncCookie(token: string | null) {
   if (typeof document === 'undefined') return
+  // Secure только по HTTPS (иначе cookie не выставится на localhost в dev)
+  const secure = typeof location !== 'undefined' && location.protocol === 'https:' ? '; Secure' : ''
   if (token) {
-    document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`
+    document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax${secure}`
   } else {
-    document.cookie = 'auth_token=; path=/; max-age=0'
+    document.cookie = `auth_token=; path=/; max-age=0; SameSite=Lax${secure}`
   }
 }
 

@@ -73,6 +73,10 @@ export const authApi = {
 
   resetPassword: (data: { email: string; token: string; password: string; password_confirmation: string }) =>
     api.post('/auth/reset-password', data),
+
+  // Обмен одноразового кода из OAuth-колбэка на токен (токен не идёт через URL)
+  socialExchange: (code: string) =>
+    api.post('/auth/social/exchange', { code }),
 }
 
 export const notificationApi = {

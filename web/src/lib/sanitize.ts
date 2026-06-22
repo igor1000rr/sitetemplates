@@ -1,26 +1,36 @@
 /**
- * Простая серверная санитизация HTML контента
- * Удаляет опасные теги (script, iframe, form, object, embed) и on* атрибуты
- * Используется для блог-контента из Filament (только админ пишет, но на всякий случай)
+ * Лёгкая серверная санитизация HTML для блог-контента.
+ * Контент пишет только администратор через Filament, поэтому модель угроз
+ * ограничена — это НЕ полноценный санитайзер. Для контента от недоверенных
+ * пользователей используйте DOMPurify / sanitize-html (defense-in-depth).
  */
 export function sanitizeHtml(html: string): string {
   if (!html) return ''
 
-  return html
-    // Удаляем опасные теги с содержимым
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<iframe[\s\S]*?<\/iframe>/gi, '')
-    .replace(/<iframe[\s\S]*?\/?>/gi, '')
-    .replace(/<object[\s\S]*?<\/object>/gi, '')
-    .replace(/<embed[\s\S]*?\/?>/gi, '')
-    .replace(/<form[\s\S]*?<\/form>/gi, '')
-    .replace(/<input[\s\S]*?\/?>/gi, '')
-    .replace(/<textarea[\s\S]*?<\/textarea>/gi, '')
-    .replace(/<button[\s\S]*?<\/button>/gi, '')
-    // Удаляем on* event handlers из атрибутов
-    .replace(/\s+on\w+\s*=\s*"[^"]*"/gi, '')
-    .replace(/\s+on\w+\s*=\s*'[^']*'/gi, '')
-    // Удаляем javascript: URLs
-    .replace(/href\s*=\s*"javascript:[^"]*"/gi, 'href="#"')
-    .replace(/src\s*=\s*"javascript:[^"]*"/gi, 'src=""')
+  let out = html
+
+  // 1. Опасные парные теги вместе с содержимым
+  const pairTags = ['script', 'style', 'iframe', 'object', 'embed', 'form', 'textarea', 'svg', 'math']
+  for (const tag of pairTags) {
+    out = out.replace(new RegExp(`<${tag}[\\s\\S]*?</${tag}>`, 'gi'), '')
+  }
+
+  // 2. Опасные одиночные/незакрытые теги
+  const singleTags = ['script', 'iframe', 'object', 'embed', 'input', 'button', 'link', 'meta', 'base', 'svg']
+  for (const tag of singleTags) {
+    out = out.replace(new RegExp(`<${tag}\\b[^>]*/?>`, 'gi'), '')
+  }
+
+  out = out
+    // 3. on*-обработчики: двойные, одинарные кавычки и без кавычек
+    .replace(/\son\w+\s*=\s*"[^"]*"/gi, '')
+    .replace(/\son\w+\s*=\s*'[^']*'/gi, '')
+    .replace(/\son\w+\s*=\s*[^\s>]+/gi, '')
+    // 4. javascript: в href/src/xlink:href (любое кавычкирование)
+    .replace(/(\b(?:href|src|xlink:href)\s*=\s*)(["'])\s*javascript:[^"']*\2/gi, '$1$2#$2')
+    .replace(/(\b(?:href|src|xlink:href)\s*=\s*)javascript:[^\s>]+/gi, '$1"#"')
+    // 5. data:text/html (XSS); data:image/* намеренно сохраняем
+    .replace(/(\b(?:href|src|xlink:href)\s*=\s*)(["'])\s*data:text\/html[^"']*\2/gi, '$1$2#$2')
+
+  return out
 }
