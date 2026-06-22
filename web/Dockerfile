@@ -9,7 +9,17 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-ENV NEXT_TELEMETRY_DISABLED=1
+# NEXT_PUBLIC_* инлайнятся в клиентский бандл на этапе build, поэтому их нужно
+# передать как build-args (иначе аналитика YM/GA не включится даже при заданных ID).
+ARG NEXT_PUBLIC_API_URL=
+ARG NEXT_PUBLIC_SITE_URL=https://aitempl.ru
+ARG NEXT_PUBLIC_YM_ID=
+ARG NEXT_PUBLIC_GA_ID=
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+    NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL \
+    NEXT_PUBLIC_YM_ID=$NEXT_PUBLIC_YM_ID \
+    NEXT_PUBLIC_GA_ID=$NEXT_PUBLIC_GA_ID \
+    NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 FROM base AS runner

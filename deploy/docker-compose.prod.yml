@@ -83,6 +83,13 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
+      args:
+        # NEXT_PUBLIC_* инлайнятся в клиентский бандл на build — поэтому передаём
+        # их как build-args (иначе YM/GA-аналитика не включится даже при заданных ID).
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://aitempl.ru}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-https://aitempl.ru}
+        NEXT_PUBLIC_YM_ID: ${NEXT_PUBLIC_YM_ID:-}
+        NEXT_PUBLIC_GA_ID: ${NEXT_PUBLIC_GA_ID:-}
     restart: unless-stopped
     depends_on:
       - api

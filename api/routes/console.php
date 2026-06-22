@@ -19,20 +19,29 @@ Schedule::job(new \App\Jobs\SendSubscriptionExpiringReminders)->dailyAt('09:00')
 
 Schedule::job(new \App\Jobs\RenewSubscriptions)->dailyAt('06:00');
 
-// ─── Диагностика S3 (временная) ───
-Artisan::command('diag:s3', function () {
-    $c = config('filesystems.disks.s3');
-    $this->line('driver='.($c['driver'] ?? '?'));
-    $this->line('region='.($c['region'] ?? ''));
-    $this->line('bucket='.($c['bucket'] ?? ''));
-    $this->line('endpoint='.($c['endpoint'] ?? ''));
-    $this->line('use_path_style='.var_export($c['use_path_style_endpoint'] ?? null, true));
-    $this->line('key='.(!empty($c['key']) ? 'SET ('.strlen($c['key']).' chars)' : 'EMPTY'));
-    $this->line('secret='.(!empty($c['secret']) ? 'SET' : 'EMPTY'));
+// ─── Диагностика готовности к запуску (временная, без вывода секретов) ───
+Artisan::command('diag:launch', function () {
+    $mask = fn ($v) => !empty($v) ? 'SET' : 'EMPTY';
+
+    $this->line('── S3 ──');
+    $s3 = config('filesystems.disks.s3');
+    $this->line('region='.($s3['region'] ?? ''));
+    $this->line('bucket='.($s3['bucket'] ?? ''));
+    $this->line('endpoint='.($s3['endpoint'] ?? ''));
+    $this->line('use_path_style='.var_export($s3['use_path_style_endpoint'] ?? null, true));
+    $this->line('key='.$mask($s3['key'] ?? null).' secret='.$mask($s3['secret'] ?? null));
     try {
-        $exists = \Illuminate\Support\Facades\Storage::disk('s3')->exists('health_check');
-        $this->info('S3_CHECK=OK (exists='.var_export($exists, true).')');
+        \Illuminate\Support\Facades\Storage::disk('s3')->exists('health_check');
+        $this->info('S3_CHECK=OK');
     } catch (\Throwable $e) {
-        $this->error('S3_CHECK_ERROR='.get_class($e).' :: '.substr($e->getMessage(), 0, 500));
+        $this->error('S3_CHECK_ERROR='.class_basename($e).' :: '.substr($e->getMessage(), 0, 200));
     }
-})->purpose('Диагностика подключения к S3 без вывода секретов');
+
+    $this->line('── Интеграции (SET/EMPTY) ──');
+    $this->line('yookassa: shop_id='.$mask(config('services.yookassa.shop_id')).' secret='.$mask(config('services.yookassa.secret_key')));
+    $this->line('telegram: bot_token='.$mask(config('services.telegram.bot_token')).' admin_chat_id='.$mask(config('services.telegram.admin_chat_id')));
+    $this->line('mail: username='.$mask(config('mail.mailers.smtp.username')).' password='.$mask(config('mail.mailers.smtp.password')));
+    $this->line('openai: api_key='.$mask(config('services.openai.api_key')));
+    $this->line('google: client_id='.$mask(config('services.google.client_id')).' secret='.$mask(config('services.google.client_secret')));
+    $this->line('yandex: client_id='.$mask(config('services.yandex.client_id')).' secret='.$mask(config('services.yandex.client_secret')));
+})->purpose('Диагностика готовности к запуску (S3 + интеграции, без секретов)');

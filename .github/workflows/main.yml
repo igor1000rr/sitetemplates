@@ -172,7 +172,7 @@ jobs:
               echo "✅ TLS-сертификат ещё действителен (>7 дней) — пропускаю"
             fi
 
-            echo ">>> S3 diag (временно)"
-            docker compose exec -T api php artisan diag:s3 2>&1 || true
+            echo ">>> Диагностика готовности к запуску (временно)"
+            docker compose exec -T api php artisan diag:launch 2>&1 || true
 
             echo "✅ Deploy successful at $(date)"
