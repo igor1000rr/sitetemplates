@@ -44,7 +44,11 @@
 > (Resend по SMTP, инжект ключа в деплое).
 
 ### 3. Брендинг
-- [ ] Заменить дефолтные иконки / favicon на брендированные (см. `project-summary.md`).
+- [x] Плейсхолдер «TemplateName» в OG-картинке и буква «T» в иконках заменены на
+      бренд «AITempl»; `og-image.png` перерисован из битого SVG-как-PNG в настоящий
+      PNG 1200×630 (превью ссылок теперь рендерятся в мессенджерах) — `be20b65`.
+- [ ] (Опционально) Если нужен фирменный логотип вместо буквенной «A» — прислать
+      исходник, заменю favicon/иконки/OG.
 
 ---
 
@@ -85,6 +89,8 @@ Redirect URI для OAuth: `https://aitempl.ru/api/auth/google/callback` и `htt
       хайрпина через web-контейнер); в sitemap добавлены маркетинговые страницы
       (pricing, faq, contact, custom-development, legal); robots больше не блокирует
       публичные профили `/authors/{slug}` (чинит prefix-match `/author`).
+- [x] Брендинг: OG-картинка и иконки перерисованы под «AITempl» (убран плейсхолдер
+      «TemplateName»; `og-image.png` стал настоящим PNG, а не SVG с расширением .png).
 
 ---
 
