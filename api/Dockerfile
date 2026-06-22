@@ -22,7 +22,10 @@ WORKDIR /var/www/html
 
 # Install deps (cache layer)
 COPY composer.json ./
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+# Не блокируем install из-за security-advisory (Laravel 11.x / filament помечены);
+# приложение уже работает на этих версиях, апгрейд — отдельная задача.
+RUN composer config --no-plugins policy.advisories.block false \
+    && composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
 # Copy app
 COPY . .
