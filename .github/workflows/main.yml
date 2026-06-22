@@ -139,4 +139,19 @@ jobs:
               exit 1
             fi
 
+            echo ">>> TLS: renewal-hooks + продление при необходимости"
+            # Причина прошлой просрочки: авто-renew в режиме standalone конфликтовал с
+            # nginx на :80 и молча падал. Ставим renewal-hooks (их использует и
+            # systemd-таймер certbot, и ручной renew) — они останавливают/запускают
+            # nginx вокруг продления. На свежем серте renew — no-op без даунтайма.
+            if ! command -v certbot >/dev/null 2>&1; then
+              apt-get update -qq && apt-get install -y -qq certbot || true
+            fi
+            mkdir -p /etc/letsencrypt/renewal-hooks/pre /etc/letsencrypt/renewal-hooks/post
+            printf '#!/bin/sh\ncd /opt/sitetemplates && docker compose stop nginx\n' > /etc/letsencrypt/renewal-hooks/pre/stop-nginx.sh
+            printf '#!/bin/sh\ncd /opt/sitetemplates && cp /etc/letsencrypt/live/aitempl.ru/*.pem deploy/ssl/ 2>/dev/null || true; docker compose up -d nginx\n' > /etc/letsencrypt/renewal-hooks/post/start-nginx.sh
+            chmod +x /etc/letsencrypt/renewal-hooks/pre/stop-nginx.sh /etc/letsencrypt/renewal-hooks/post/start-nginx.sh
+            certbot renew --non-interactive --quiet && echo "✅ TLS renew OK" || echo "⚠️  certbot renew не сработал — проверить вручную"
+            docker compose up -d nginx || true
+
             echo "✅ Deploy successful at $(date)"
