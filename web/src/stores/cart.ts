@@ -9,11 +9,14 @@ function syncAbandonedCart(items: CartItem[]) {
   if (syncTimeout) clearTimeout(syncTimeout)
   syncTimeout = setTimeout(async () => {
     try {
-      const token = localStorage.getItem('auth_token')
-      if (!token || items.length === 0) return
+      if (items.length === 0) return
+
+      // Синхронизируем только для авторизованных (токен больше не лежит в localStorage)
+      const { useAuth } = await import('@/stores/auth')
+      if (!useAuth.getState().isAuthenticated) return
 
       const { default: api } = await import('@/lib/api')
-      await (api as any).post('/cart/save', {
+      await api.post('/cart/save', {
         items: items.map(i => ({
           template_id: i.id,
           title: i.title,

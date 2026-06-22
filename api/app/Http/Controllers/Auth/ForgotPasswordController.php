@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\AuthCookie;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -87,6 +88,7 @@ class ForgotPasswordController extends Controller
         // Отзываем все токены (безопасность)
         $user->tokens()->delete();
 
-        return response()->json(['message' => 'Пароль успешно изменён. Войдите с новым паролем.']);
+        return response()->json(['message' => 'Пароль успешно изменён. Войдите с новым паролем.'])
+            ->withCookie(AuthCookie::forget());
     }
 }

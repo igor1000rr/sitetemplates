@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\WelcomeNotification;
+use App\Support\AuthCookie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
@@ -105,6 +106,6 @@ class SocialAuthController extends Controller
             return response()->json(['message' => 'Код недействителен или истёк'], 422);
         }
 
-        return response()->json(['token' => $token]);
+        return response()->json(['token' => $token])->withCookie(AuthCookie::make($token));
     }
 }

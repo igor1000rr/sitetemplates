@@ -22,8 +22,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // API middleware
         $middleware->api(prepend: [
+            \App\Http\Middleware\AuthTokenFromCookie::class,
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);
+
+        // auth_token хранится как httpOnly-cookie и читается как сырой Bearer-токен —
+        // не шифруем её, иначе middleware-инъектор получит шифртекст
+        $middleware->encryptCookies(except: ['auth_token']);
 
         // Middleware aliases
         $middleware->alias([

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\WelcomeNotification;
 use App\Services\ReferralService;
+use App\Support\AuthCookie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -40,6 +41,6 @@ class RegisterController extends Controller
         return response()->json([
             'user' => $user->only('id', 'name', 'email', 'role'),
             'token' => $token,
-        ], 201);
+        ], 201)->withCookie(AuthCookie::make($token));
     }
 }

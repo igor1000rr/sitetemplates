@@ -1,20 +1,27 @@
 import axios from 'axios'
 
+// Access-токен держим только в памяти (НЕ в localStorage) — это снижает риск
+// кражи токена через XSS. В проде сессия восстанавливается из httpOnly-cookie
+// auth_token, которую ставит бэкенд; здесь токен идёт как Bearer в рамках сессии.
+let authToken: string | null = null
+export function setAuthToken(token: string | null) {
+  authToken = token
+}
+
 const api = axios.create({
   baseURL: '/api',
+  withCredentials: true, // отправляем httpOnly-cookie auth_token на бэкенд
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
   },
 })
 
-// Auth token interceptor
+// Auth token interceptor — Bearer из памяти, если есть; иначе бэкенд
+// аутентифицирует по httpOnly-cookie (middleware AuthTokenFromCookie)
 api.interceptors.request.use((config) => {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('auth_token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
+  if (authToken) {
+    config.headers.Authorization = `Bearer ${authToken}`
   }
   return config
 })
@@ -24,10 +31,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth_token')
-        // Можно редиректить на логин
-      }
+      authToken = null
     }
     return Promise.reject(error)
   }

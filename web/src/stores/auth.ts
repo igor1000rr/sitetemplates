@@ -1,18 +1,6 @@
 import { create } from 'zustand'
-import { authApi } from '@/lib/api'
+import { authApi, setAuthToken } from '@/lib/api'
 import type { User } from '@/types'
-
-// Sync cookie for middleware (server-side redirect check)
-function syncCookie(token: string | null) {
-  if (typeof document === 'undefined') return
-  // Secure только по HTTPS (иначе cookie не выставится на localhost в dev)
-  const secure = typeof location !== 'undefined' && location.protocol === 'https:' ? '; Secure' : ''
-  if (token) {
-    document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax${secure}`
-  } else {
-    document.cookie = `auth_token=; path=/; max-age=0; SameSite=Lax${secure}`
-  }
-}
 
 interface AuthStore {
   user: User | null
@@ -28,15 +16,14 @@ interface AuthStore {
   setUser: (user: User) => void
 }
 
-export const useAuth = create<AuthStore>((set, get) => ({
+export const useAuth = create<AuthStore>((set) => ({
   user: null,
-  token: typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null,
+  token: null,
   isLoading: false,
   isAuthenticated: false,
 
   setToken: (token: string) => {
-    localStorage.setItem('auth_token', token)
-    syncCookie(token)
+    setAuthToken(token)
     set({ token })
   },
 
@@ -48,8 +35,7 @@ export const useAuth = create<AuthStore>((set, get) => ({
     set({ isLoading: true })
     try {
       const { data } = await authApi.login({ email, password })
-      localStorage.setItem('auth_token', data.token)
-      syncCookie(data.token)
+      setAuthToken(data.token)
       set({ user: data.user, token: data.token, isAuthenticated: true })
     } finally {
       set({ isLoading: false })
@@ -66,8 +52,7 @@ export const useAuth = create<AuthStore>((set, get) => ({
         password_confirmation: password,
         referral_code: referralCode || undefined,
       })
-      localStorage.setItem('auth_token', data.token)
-      syncCookie(data.token)
+      setAuthToken(data.token)
       set({ user: data.user, token: data.token, isAuthenticated: true })
     } finally {
       set({ isLoading: false })
@@ -76,24 +61,21 @@ export const useAuth = create<AuthStore>((set, get) => ({
 
   logout: async () => {
     try {
-      await authApi.logout()
+      await authApi.logout() // бэкенд удаляет токен и сбрасывает httpOnly-cookie
     } catch {}
-    localStorage.removeItem('auth_token')
-    syncCookie(null)
+    setAuthToken(null)
     set({ user: null, token: null, isAuthenticated: false })
   },
 
   loadUser: async () => {
-    const token = get().token
-    if (!token) return
-
+    // Пытаемся всегда: в проде сессия восстановится из httpOnly-cookie,
+    // даже если токена в памяти нет (например, после перезагрузки страницы).
     set({ isLoading: true })
     try {
       const { data } = await authApi.user()
       set({ user: data, isAuthenticated: true })
     } catch {
-      localStorage.removeItem('auth_token')
-      syncCookie(null)
+      setAuthToken(null)
       set({ user: null, token: null, isAuthenticated: false })
     } finally {
       set({ isLoading: false })

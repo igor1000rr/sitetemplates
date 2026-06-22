@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\AuthCookie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -31,14 +32,14 @@ class LoginController extends Controller
         return response()->json([
             'user' => $user->only('id', 'name', 'email', 'role', 'phone', 'avatar'),
             'token' => $token,
-        ]);
+        ])->withCookie(AuthCookie::make($token));
     }
 
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'OK']);
+        return response()->json(['message' => 'OK'])->withCookie(AuthCookie::forget());
     }
 
     public function updateProfile(Request $request)
@@ -92,6 +93,6 @@ class LoginController extends Controller
             'deleted_at' => now(),
         ]);
 
-        return response()->json(['message' => 'Аккаунт удалён.']);
+        return response()->json(['message' => 'Аккаунт удалён.'])->withCookie(AuthCookie::forget());
     }
 }
