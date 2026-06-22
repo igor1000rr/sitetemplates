@@ -50,11 +50,14 @@ jobs:
           # Не блокируем установку из-за security-advisory: приложение уже работает
           # на этих версиях в проде; апгрейд зависимостей — отдельная задача.
           composer config --no-plugins policy.advisories.block false || true
-          composer install --no-interaction --prefer-dist --no-progress
+          # --no-scripts: package:discover запустится позже, после создания каталогов
+          # кэша (как в prod Dockerfile), иначе artisan падает с "valid cache path"
+          composer install --no-interaction --prefer-dist --no-progress --no-scripts
 
-      - name: Prepare env
+      - name: Prepare app
         working-directory: api
         run: |
+          mkdir -p bootstrap/cache storage/framework/cache storage/framework/sessions storage/framework/views storage/logs
           cp .env.example .env
           php artisan key:generate
 
