@@ -8,6 +8,7 @@ export default function EmailCapture() {
   const [show, setShow] = useState(false)
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [pending, setPending] = useState(false)
   const [promoCode, setPromoCode] = useState<string | null>(null)
 
   useEffect(() => {
@@ -46,9 +47,10 @@ export default function EmailCapture() {
       })
       const data = await res.json()
       setPromoCode(data.promo_code || null)
+      setPending(Boolean(data.pending))
       setSubmitted(true)
       localStorage.setItem('email_capture_dismissed', '1')
-      setTimeout(() => setShow(false), 5000)
+      setTimeout(() => setShow(false), 6000)
     } catch {
       setSubmitted(true)
       localStorage.setItem('email_capture_dismissed', '1')
@@ -63,12 +65,20 @@ export default function EmailCapture() {
       <div className="max-w-[520px] mx-auto bg-bg-card border border-accent/15 rounded-2xl shadow-[0_-10px_40px_rgba(139,92,246,0.1)] p-5">
         {submitted ? (
           <div className="text-center py-2">
-            <span className="text-green-400 text-sm font-semibold">Отлично! Скоро пришлём подборку.</span>
-            {promoCode && (
-              <div className="mt-2 bg-accent/[0.08] border border-accent/15 rounded-lg px-3 py-2 inline-block">
-                <span className="text-white/40 text-[10px] block">Ваш промокод на скидку 10%:</span>
-                <span className="text-accent-light font-bold text-sm tracking-wider">{promoCode}</span>
-              </div>
+            {pending ? (
+              <span className="text-green-400 text-sm font-semibold">
+                Проверьте почту 📬 и подтвердите подписку — там же будет ваш промокод.
+              </span>
+            ) : (
+              <>
+                <span className="text-green-400 text-sm font-semibold">Отлично! Скоро пришлём подборку.</span>
+                {promoCode && (
+                  <div className="mt-2 bg-accent/[0.08] border border-accent/15 rounded-lg px-3 py-2 inline-block">
+                    <span className="text-white/40 text-[10px] block">Ваш промокод на скидку 10%:</span>
+                    <span className="text-accent-light font-bold text-sm tracking-wider">{promoCode}</span>
+                  </div>
+                )}
+              </>
             )}
           </div>
         ) : (

@@ -93,8 +93,9 @@ Route::get('/compare', [\App\Http\Controllers\CompareController::class, 'compare
 // AI-подбор шаблона (публичный, без авторизации) — ограничиваем расход OpenAI
 Route::post('/ai/chat', [AiChatController::class, 'chat'])->middleware('throttle:20,1');
 
-// Newsletter
+// Newsletter (double opt-in)
 Route::post('/newsletter/subscribe', [\App\Http\Controllers\NewsletterController::class, 'subscribe'])->middleware('throttle:5,1');
+Route::post('/newsletter/confirm', [\App\Http\Controllers\NewsletterController::class, 'confirm'])->middleware('throttle:10,1');
 Route::post('/newsletter/unsubscribe', [\App\Http\Controllers\NewsletterController::class, 'unsubscribe'])->middleware('throttle:5,1');
 
 // Recent purchases for social proof (anonymized, cached)
