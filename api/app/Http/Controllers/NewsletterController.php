@@ -62,7 +62,7 @@ class NewsletterController extends Controller
             'updated_at' => now(),
         ]);
 
-        Log::info("Newsletter subscribe: {$email}, promo: {$promoCode}");
+        Log::info('Newsletter subscribe', ['promo' => $promoCode]); // без PII (email не логируем)
 
         return response()->json([
             'message' => 'Подписка оформлена!',
@@ -73,11 +73,26 @@ class NewsletterController extends Controller
     public function unsubscribe(Request $request)
     {
         $email = strtolower(trim($request->input('email', '')));
+        $token = (string) $request->input('token', '');
+
+        // Отписка только по подписанной ссылке из письма — иначе любой мог бы
+        // отписать произвольный email и использовать эндпоинт как oracle существования.
+        if ($email === '' || !hash_equals(self::unsubscribeToken($email), $token)) {
+            return response()->json(['message' => 'Недействительная ссылка для отписки'], 422);
+        }
 
         DB::table('newsletter_subscribers')
             ->where('email', $email)
             ->update(['unsubscribed_at' => now()]);
 
         return response()->json(['message' => 'Вы отписаны']);
+    }
+
+    /**
+     * Подписанный токен отписки (HMAC от email). Встраивается в ссылки писем.
+     */
+    public static function unsubscribeToken(string $email): string
+    {
+        return hash_hmac('sha256', strtolower(trim($email)), config('app.key'));
     }
 }

@@ -23,7 +23,8 @@ class SendReviewRequests implements ShouldQueue
     public function handle(): void
     {
         $orders = Order::where('status', 'paid')
-            ->whereBetween('updated_at', [
+            ->whereNull('review_request_sent_at') // не отправляем повторно
+            ->whereBetween('paid_at', [
                 now()->subDays(4)->startOfDay(),
                 now()->subDays(3)->endOfDay(),
             ])
@@ -51,6 +52,9 @@ class SendReviewRequests implements ShouldQueue
                         $template->title,
                         $template->slug,
                     ));
+
+                    // Помечаем заказ — больше письмо-просьбу по нему не шлём
+                    Order::whereKey($order->id)->update(['review_request_sent_at' => now()]);
 
                     Log::info("Review request sent: user #{$order->user_id}, template #{$template->id}");
                     break; // Один email на заказ, не спамим

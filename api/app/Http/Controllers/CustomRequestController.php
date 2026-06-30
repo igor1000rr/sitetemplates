@@ -27,8 +27,10 @@ class CustomRequestController extends Controller
         $cr = CustomRequest::create($data);
 
         try {
-            $text = 'New custom dev request: ' . $cr->name . ' (' . $cr->email . ')';
-            app(\App\Services\TelegramService::class)->sendMessage($text);
+            $name = htmlspecialchars((string) $cr->name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $email = htmlspecialchars((string) $cr->email, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $text = "🧩 <b>Новая заявка на разработку</b>\n\n👤 {$name}\n✉️ {$email}";
+            app(\App\Services\TelegramService::class)->send($text);
         } catch (\Throwable $e) {
             Log::warning('Telegram custom request: ' . $e->getMessage());
         }

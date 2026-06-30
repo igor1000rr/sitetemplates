@@ -42,13 +42,16 @@ class TelegramService
 
     public function notifyNewOrder(\App\Models\Order $order): bool
     {
-        $items = $order->items->map(fn ($i) => $i->template?->title)->filter()->implode("\n• ");
+        $items = $order->items
+            ->map(fn ($i) => self::esc($i->template?->title))
+            ->filter()
+            ->implode("\n• ");
         $total = number_format($order->total / 100, 0, '.', ' ');
 
         return $this->send(
             "🛒 <b>Новый заказ!</b>\n\n" .
-            "📋 {$order->order_number}\n" .
-            "👤 {$order->user->name} ({$order->user->email})\n" .
+            "📋 " . self::esc($order->order_number) . "\n" .
+            "👤 " . self::esc($order->user->name) . " (" . self::esc($order->user->email) . ")\n" .
             "📦 Шаблоны:\n• {$items}\n" .
             "💰 <b>{$total} ₽</b>\n\n" .
             "⏳ Ожидает оплаты"
@@ -61,10 +64,10 @@ class TelegramService
 
         return $this->send(
             "✅ <b>Заказ оплачен!</b>\n\n" .
-            "📋 {$order->order_number}\n" .
-            "👤 {$order->user->name}\n" .
+            "📋 " . self::esc($order->order_number) . "\n" .
+            "👤 " . self::esc($order->user->name) . "\n" .
             "💰 <b>{$total} ₽</b>\n" .
-            "💳 {$order->payment_method}"
+            "💳 " . self::esc($order->payment_method)
         );
     }
 
@@ -74,11 +77,20 @@ class TelegramService
 
         return $this->send(
             "💬 <b>Новый отзыв!</b>\n\n" .
-            "📦 {$review->template->title}\n" .
-            "👤 {$review->user->name}\n" .
+            "📦 " . self::esc($review->template->title) . "\n" .
+            "👤 " . self::esc($review->user->name) . "\n" .
             "{$stars}\n" .
-            "\"{$review->text}\"\n\n" .
+            '"' . self::esc($review->text) . "\"\n\n" .
             "⏳ Ожидает модерации"
         );
+    }
+
+    /**
+     * Экранирование пользовательских значений для Telegram parse_mode=HTML.
+     * Без него можно внедрить <a href>/<b> или сломать сообщение (Telegram 400).
+     */
+    private static function esc(?string $value): string
+    {
+        return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 }

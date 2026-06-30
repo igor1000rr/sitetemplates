@@ -14,17 +14,17 @@ class UploadController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|max:512000', // 500MB
+            // mimes проверяет тип по реальному содержимому (guessed MIME), а не по
+            // имени файла от клиента. SVG намеренно исключён (встроенный JS → XSS).
+            'file' => 'required|file|max:512000|mimes:zip,rar,7z,jpg,jpeg,png,webp,gif,pdf', // 500MB
             'folder' => 'nullable|string|max:100',
         ]);
 
         $file = $request->file('file');
-        $ext = strtolower($file->getClientOriginalExtension());
+        // Расширение определяем по содержимому, а не из имени, которое подконтрольно клиенту
+        $ext = strtolower($file->extension() ?: $file->getClientOriginalExtension());
         $folder = $request->input('folder', 'templates');
 
-        // Белый список расширений.
-        // SVG намеренно исключён: он может содержать встроенный JavaScript
-        // (вектор хранимого XSS, если файл будет отдан с того же origin).
         $allowed = ['zip', 'rar', '7z', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'pdf'];
         if (!in_array($ext, $allowed)) {
             return response()->json(['message' => "Тип файла .{$ext} не разрешён"], 422);
