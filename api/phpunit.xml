@@ -28,5 +28,8 @@
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
+        <!-- В тестах вебхук вызывается с локального IP — явным флагом разрешаем
+             обойти IP-allowlist ЮKassa (в prod/staging флаг выключен). -->
+        <env name="YUKASSA_ALLOW_INSECURE_WEBHOOK" value="true"/>
     </php>
 </phpunit>

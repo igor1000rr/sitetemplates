@@ -53,7 +53,8 @@ class PaymentWebhookTest extends TestCase
         ];
 
         // В testing ЮKassa не настроена → статус берётся из тела (fallback).
-        // IP-whitelist активен только в production.
+        // IP-whitelist активен всегда, но в тестах обходится флагом
+        // YUKASSA_ALLOW_INSECURE_WEBHOOK (см. phpunit.xml).
         $this->postJson('/api/payment/webhook', $payload)->assertOk();
         // Повторная доставка того же события — без двойной обработки
         $this->postJson('/api/payment/webhook', $payload)->assertOk();
