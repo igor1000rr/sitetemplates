@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import dynamic from 'next/dynamic'
+import { headers } from 'next/headers'
 import { Inter, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import TopBar from '@/components/layout/TopBar'
@@ -68,6 +69,8 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const nonce = headers().get('x-nonce') ?? undefined
+
   return (
     <html lang="ru" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <head>
@@ -83,7 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <WebsiteSearchSchema />
       </head>
       <body className="min-h-screen bg-bg text-white font-sans antialiased">
-        <Analytics />
+        <Analytics nonce={nonce} />
         <AuthProvider>
           <ToastProvider>
             <TopBar />

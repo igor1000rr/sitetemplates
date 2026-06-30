@@ -7,7 +7,7 @@ import { hasAnalyticsConsent, CONSENT_EVENT } from '@/components/shared/CookieCo
 const YM_ID = process.env.NEXT_PUBLIC_YM_ID
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID
 
-export default function Analytics() {
+export default function Analytics({ nonce }: { nonce?: string }) {
   // Трекеры (вкл. webvisor / session replay) грузим ТОЛЬКО после согласия на cookie.
   const [consent, setConsent] = useState(false)
 
@@ -24,7 +24,7 @@ export default function Analytics() {
     <>
       {/* Yandex.Metrika */}
       {YM_ID && (
-        <Script id="yandex-metrika" strategy="afterInteractive">
+        <Script id="yandex-metrika" strategy="afterInteractive" nonce={nonce}>
           {`
             (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
             m[i].l=1*new Date();
@@ -45,8 +45,8 @@ export default function Analytics() {
       {/* Google Analytics 4 */}
       {GA_ID && (
         <>
-          <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
-          <Script id="google-analytics" strategy="afterInteractive">
+          <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" nonce={nonce} />
+          <Script id="google-analytics" strategy="afterInteractive" nonce={nonce}>
             {`
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
