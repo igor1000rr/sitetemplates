@@ -72,21 +72,25 @@ class OrderController extends Controller
             }
         }
         $subtotal += $servicesTotal;
-        $discount = 0;
-        $promoCode = null;
+        $promoInput = !empty($data['promo_code']) ? strtoupper($data['promo_code']) : null;
 
-        // Промокод
-        if (!empty($data['promo_code'])) {
-            $promoCode = PromoCode::where('code', strtoupper($data['promo_code']))->first();
-            if ($promoCode && $promoCode->isValid($subtotal)) {
-                $discount = $promoCode->calculateDiscount($subtotal);
+        // Создаём заказ. Промокод валидируем и инкрементим под блокировкой строки,
+        // чтобы max_uses нельзя было превысить гонкой параллельных заказов.
+        $order = DB::transaction(function () use ($request, $data, $templates, $subtotal, $promoInput, $servicesMap) {
+            $discount = 0;
+            $promoCode = null;
+
+            if ($promoInput) {
+                $promoCode = PromoCode::where('code', $promoInput)->lockForUpdate()->first();
+                if ($promoCode && $promoCode->isValid($subtotal)) {
+                    $discount = $promoCode->calculateDiscount($subtotal);
+                } else {
+                    $promoCode = null;
+                }
             }
-        }
 
-        $total = max($subtotal - $discount, 0);
+            $total = max($subtotal - $discount, 0);
 
-        // Создаём заказ
-        $order = DB::transaction(function () use ($request, $data, $templates, $subtotal, $discount, $total, $promoCode, $servicesMap) {
             $order = Order::create([
                 'order_number' => Order::generateNumber(),
                 'user_id' => $request->user()->id,
@@ -125,6 +129,17 @@ class OrderController extends Controller
 
             return $order;
         });
+
+        // Бесплатный заказ (100%-промокод / бесплатные шаблоны) — закрываем без ЮKassa
+        if ($order->total === 0) {
+            app(\App\Services\OrderFulfillmentService::class)->completeOrder($order, 'free');
+
+            return response()->json([
+                'order' => new OrderResource($order->fresh()->load('items.template')),
+                'payment_url' => null,
+                'free' => true,
+            ], 201);
+        }
 
         // Создаём платёж ЮKassa
         $payment = $this->paymentService->createPayment($order);

@@ -16,8 +16,9 @@ Schedule::job(new \App\Jobs\SendReviewRequests)->dailyAt('10:00');
 Schedule::job(new \App\Jobs\SendSubscriptionExpiringReminders)->dailyAt('09:00');
 
 // ─── Автопродление подписок ───
+// withoutOverlapping — чтобы зависший/повторный запуск не списывал повторно
 
-Schedule::job(new \App\Jobs\RenewSubscriptions)->dailyAt('06:00');
+Schedule::job(new \App\Jobs\RenewSubscriptions)->dailyAt('06:00')->withoutOverlapping();
 
 // ─── Диагностика S3 (временная) ───
 Artisan::command('diag:s3', function () {

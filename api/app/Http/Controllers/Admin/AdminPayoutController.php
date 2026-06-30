@@ -59,20 +59,35 @@ class AdminPayoutController extends Controller
             'admin_note' => 'nullable|string|max:500',
         ]);
 
-        // Если отклоняем — возвращаем деньги на баланс автора
-        if ($data['status'] === 'rejected' && $payout->status !== 'rejected') {
-            $profile = $payout->author->authorProfile;
-            if ($profile) {
-                $profile->increment('balance', $payout->amount);
-            }
+        // completed/rejected — терминальные статусы. Из них переход запрещён,
+        // иначе rejected→processing→rejected повторно возвращал бы деньги автору.
+        if (in_array($payout->status, ['completed', 'rejected'], true)) {
+            return response()->json([
+                'message' => 'Заявка уже в финальном статусе и не может быть изменена.',
+            ], 422);
         }
 
-        $payout->update([
-            'status' => $data['status'],
-            'admin_note' => $data['admin_note'] ?? $payout->admin_note,
-            'completed_at' => $data['status'] === 'completed' ? now() : $payout->completed_at,
-        ]);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($payout, $data) {
+            $locked = Payout::whereKey($payout->id)->lockForUpdate()->first();
+            if (in_array($locked->status, ['completed', 'rejected'], true)) {
+                return;
+            }
 
-        return response()->json(['message' => 'Статус обновлён', 'status' => $payout->status]);
+            // Возвращаем деньги на баланс автора только при первом переходе в rejected
+            if ($data['status'] === 'rejected') {
+                $profile = $locked->author->authorProfile;
+                if ($profile) {
+                    $profile->increment('balance', $locked->amount);
+                }
+            }
+
+            $locked->update([
+                'status' => $data['status'],
+                'admin_note' => $data['admin_note'] ?? $locked->admin_note,
+                'completed_at' => $data['status'] === 'completed' ? now() : $locked->completed_at,
+            ]);
+        });
+
+        return response()->json(['message' => 'Статус обновлён', 'status' => $payout->fresh()->status]);
     }
 }

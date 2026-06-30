@@ -7,6 +7,7 @@ use App\Models\SubscriptionPlan;
 use App\Models\User;
 use App\Notifications\SubscriptionActivatedNotification;
 use YooKassa\Client;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class SubscriptionService
@@ -39,17 +40,16 @@ class SubscriptionService
             throw new \Exception('Некорректная цена плана');
         }
 
-        // Создаём подписку в статусе pending
+        // Подписка создаётся в статусе pending и НЕ даёт доступа, пока оплата
+        // не подтверждена вебхуком. Период начинается с момента оплаты.
         $subscription = Subscription::create([
             'user_id' => $user->id,
             'plan_id' => $plan->id,
             'billing_cycle' => $cycle,
-            'status' => 'active', // станет active после оплаты
+            'status' => 'pending',
             'price_paid' => $price,
-            'current_period_start' => now(),
-            'current_period_end' => $cycle === 'annual'
-                ? now()->addYear()
-                : now()->addMonth(),
+            'current_period_start' => null,
+            'current_period_end' => null,
         ]);
 
         // Создаём платёж в ЮKassa с сохранением способа оплаты
@@ -85,43 +85,84 @@ class SubscriptionService
     }
 
     /**
-     * Обработка успешного платежа подписки (из webhook)
+     * Обработка успешного платежа подписки (из webhook).
+     * $payment — нормализованные ДОВЕРЕННЫЕ данные из API ЮKassa
+     * (status / amount / metadata / payment_method).
      */
-    public function handlePaymentSuccess(array $paymentData): void
+    public function handlePaymentSuccess(array $payment): void
     {
-        $metadata = $paymentData['metadata'] ?? [];
+        $metadata = $payment['metadata'] ?? [];
+        $type = $metadata['type'] ?? '';
 
-        if (($metadata['type'] ?? '') !== 'subscription') {
+        if (!in_array($type, ['subscription', 'subscription_renewal'])) {
             return; // Это не подписка
         }
 
         $subscriptionId = $metadata['subscription_id'] ?? null;
         if (!$subscriptionId) return;
 
-        $subscription = Subscription::find($subscriptionId);
+        $subscription = Subscription::with('plan')->find($subscriptionId);
         if (!$subscription) {
             Log::error("Subscription not found: {$subscriptionId}");
             return;
         }
 
-        // Сохраняем способ оплаты для автопродлений
-        $paymentMethodId = $paymentData['payment_method']['id'] ?? null;
-        if ($paymentMethodId) {
-            $subscription->update([
-                'yukassa_payment_method_id' => $paymentMethodId,
-                'status' => 'active',
+        // Сверяем оплаченную сумму с ценой плана за выбранный цикл
+        $expectedPrice = $subscription->billing_cycle === 'annual'
+            ? $subscription->plan?->annual_price
+            : $subscription->plan?->price;
+
+        if (!$this->amountMatches($payment, (int) $expectedPrice)) {
+            Log::error("Subscription #{$subscription->id}: amount mismatch", [
+                'expected' => $expectedPrice,
+                'paid' => $payment['amount']['value'] ?? null,
             ]);
+            return;
         }
 
-        // Email — подписка активирована
-        $subscription->load('plan');
-        $subscription->user->notify(new SubscriptionActivatedNotification($subscription));
+        $paymentMethodId = $payment['payment_method_id'] ?? null;
 
-        Log::info("Subscription activated: #{$subscription->id} for user #{$subscription->user_id}");
+        if ($type === 'subscription_renewal') {
+            $this->extendRenewal($subscription);
+            return;
+        }
+
+        // Первичная активация — идемпотентно (только из не-active состояния)
+        $activated = DB::transaction(function () use ($subscription, $paymentMethodId) {
+            $locked = Subscription::whereKey($subscription->id)->lockForUpdate()->first();
+            if (!$locked || $locked->status === 'active') {
+                return false;
+            }
+
+            $start = now();
+            $end = $locked->billing_cycle === 'annual' ? $start->copy()->addYear() : $start->copy()->addMonth();
+
+            $locked->update([
+                'status' => 'active',
+                'current_period_start' => $start,
+                'current_period_end' => $end,
+                'downloads_used' => 0,
+                'yukassa_payment_method_id' => $paymentMethodId ?: $locked->yukassa_payment_method_id,
+            ]);
+
+            return true;
+        });
+
+        if ($activated) {
+            $subscription->refresh()->load('plan');
+            try {
+                $subscription->user->notify(new SubscriptionActivatedNotification($subscription));
+            } catch (\Throwable $e) {
+                Log::error("Subscription activation email failed: {$e->getMessage()}");
+            }
+            Log::info("Subscription activated: #{$subscription->id} for user #{$subscription->user_id}");
+        }
     }
 
     /**
-     * Автопродление подписки (вызывается из scheduled job)
+     * Автопродление подписки (вызывается из scheduled job).
+     * Период НЕ продлевается оптимистично — только после подтверждённой оплаты
+     * (синхронно, если ЮKassa сразу вернула succeeded, и/или через webhook).
      */
     public function renewSubscription(Subscription $subscription): bool
     {
@@ -141,6 +182,11 @@ class SubscriptionService
             ? $plan->annual_price
             : $plan->price;
 
+        // Детерминированный ключ идемпотентности привязан к периоду —
+        // повторный/параллельный вызов будет дедуплицирован самой ЮKassa.
+        $periodKey = optional($subscription->current_period_end)->timestamp ?? $subscription->id;
+        $idempotenceKey = "renew_{$subscription->id}_{$periodKey}";
+
         try {
             $payment = $this->client->createPayment([
                 'amount' => [
@@ -154,15 +200,15 @@ class SubscriptionService
                     'type' => 'subscription_renewal',
                     'subscription_id' => $subscription->id,
                 ],
-            ], uniqid('renew_', true));
+            ], $idempotenceKey);
 
-            // Продлеваем подписку
-            $subscription->update([
-                'price_paid' => $price,
-            ]);
-            $subscription->renew();
+            // Продлеваем только если оплата уже подтверждена; иначе ждём webhook.
+            if ((string) $payment->getStatus() === 'succeeded') {
+                $subscription->update(['price_paid' => $price]);
+                $this->extendRenewal($subscription);
+            }
 
-            Log::info("Subscription renewed: #{$subscription->id}");
+            Log::info("Subscription renewal initiated: #{$subscription->id}");
             return true;
 
         } catch (\Throwable $e) {
@@ -173,11 +219,50 @@ class SubscriptionService
     }
 
     /**
+     * Продлить период подписки после подтверждённой оплаты — идемпотентно.
+     */
+    private function extendRenewal(Subscription $subscription): void
+    {
+        DB::transaction(function () use ($subscription) {
+            $locked = Subscription::whereKey($subscription->id)->lockForUpdate()->first();
+            if (!$locked || $locked->isCancelled()) {
+                return;
+            }
+
+            // Уже продлено (период далеко в будущем) — повторный webhook игнорируем.
+            if ($locked->current_period_end && $locked->current_period_end->isFuture()
+                && $locked->current_period_end->gt(now()->addDays(2))) {
+                return;
+            }
+
+            $locked->renew();
+        });
+    }
+
+    /**
      * Отмена подписки (доступ до конца периода)
      */
     public function cancelSubscription(Subscription $subscription): void
     {
         $subscription->cancel();
         Log::info("Subscription cancelled: #{$subscription->id}, active until {$subscription->current_period_end}");
+    }
+
+    private function amountMatches(array $payment, int $expectedKopecks): bool
+    {
+        if ($expectedKopecks <= 0) {
+            return false;
+        }
+
+        $paid = $payment['amount']['value'] ?? null;
+        if ($paid === null) {
+            return true; // dev fallback — сумма из API недоступна
+        }
+
+        $currency = $payment['amount']['currency'] ?? null;
+        $expected = number_format($expectedKopecks / 100, 2, '.', '');
+
+        return number_format((float) $paid, 2, '.', '') === $expected
+            && ($currency === null || $currency === 'RUB');
     }
 }

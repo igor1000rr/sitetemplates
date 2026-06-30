@@ -78,13 +78,38 @@ class ReferralService
             'order_id' => $order->id,
             'type' => 'order_commission',
             'amount' => $commission,
-            'description' => "Комиссия {$order->order_number} ({self::COMMISSION_PERCENT}%)",
+            'description' => "Комиссия {$order->order_number} (" . self::COMMISSION_PERCENT . '%)',
         ]);
 
         $referrer->increment('referral_balance', $commission);
         $referrer->increment('referral_total_earned', $commission);
 
         Log::info("Referral reward: #{$referrer->id} earned {$commission} from order #{$order->id}");
+    }
+
+    /**
+     * Откатить реферальные начисления по заказу (при возврате средств).
+     * Баланс не уходит в минус — списываем не больше, чем реально начислено.
+     */
+    public function reverseForOrder(Order $order): void
+    {
+        $rewards = ReferralReward::where('order_id', $order->id)->get();
+
+        foreach ($rewards as $reward) {
+            $referrer = User::find($reward->referrer_id);
+            if ($referrer) {
+                $deductBalance = min($reward->amount, (int) $referrer->referral_balance);
+                if ($deductBalance > 0) {
+                    $referrer->decrement('referral_balance', $deductBalance);
+                }
+                $deductEarned = min($reward->amount, (int) $referrer->referral_total_earned);
+                if ($deductEarned > 0) {
+                    $referrer->decrement('referral_total_earned', $deductEarned);
+                }
+            }
+            $reward->delete();
+            Log::info("Referral reward reversed: order #{$order->id}, reward #{$reward->id}");
+        }
     }
 
     /**
