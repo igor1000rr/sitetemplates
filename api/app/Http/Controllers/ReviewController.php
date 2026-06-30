@@ -22,7 +22,9 @@ class ReviewController extends Controller
             $query->orderByDesc('created_at');
         }
 
-        return $query->paginate($request->integer('per_page', 10))
+        $perPage = min(max($request->integer('per_page', 10), 1), 50);
+
+        return $query->paginate($perPage)
             ->through(fn ($r) => [
                 'id' => $r->id,
                 'name' => $r->user?->name ?? 'Пользователь',

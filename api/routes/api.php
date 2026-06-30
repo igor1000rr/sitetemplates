@@ -119,7 +119,8 @@ Route::get('/robots.txt', [\App\Http\Controllers\SitemapController::class, 'robo
 // ─── WEBHOOK (без авторизации, IP whitelist) ───
 
 Route::post('/payment/webhook', [PaymentController::class, 'webhook'])
-    ->withoutMiddleware(['throttle:api']);
+    ->withoutMiddleware(['throttle:api'])
+    ->middleware('throttle:120,1');
 
 // ─── AUTH ───
 

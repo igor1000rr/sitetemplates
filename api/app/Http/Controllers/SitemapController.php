@@ -11,6 +11,17 @@ class SitemapController extends Controller
 {
     public function index(): Response
     {
+        // Кэшируем готовый XML на час — эндпоинт публичный и иначе сканирует
+        // целиком таблицы шаблонов/категорий/постов на каждый запрос.
+        $xml = \Illuminate\Support\Facades\Cache::remember('sitemap.xml', 3600, fn () => $this->build());
+
+        return response($xml, 200, [
+            'Content-Type' => 'application/xml',
+        ]);
+    }
+
+    private function build(): string
+    {
         $templates = Template::published()
             ->select('slug', 'updated_at')
             ->orderBy('updated_at', 'desc')
@@ -73,9 +84,7 @@ class SitemapController extends Controller
 
         $xml .= '</urlset>';
 
-        return response($xml, 200, [
-            'Content-Type' => 'application/xml',
-        ]);
+        return $xml;
     }
 
     public function robots(): Response

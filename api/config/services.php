@@ -31,6 +31,9 @@ return [
     'yookassa' => [
         'shop_id' => env('YUKASSA_SHOP_ID') ? (int) env('YUKASSA_SHOP_ID') : null,
         'secret_key' => env('YUKASSA_SECRET_KEY') ?: null,
+        // Пропустить проверку IP-источника вебхука (ТОЛЬКО для локальной разработки).
+        // По умолчанию false — IP-allowlist ЮKassa применяется во всех окружениях.
+        'allow_insecure_webhook' => env('YUKASSA_ALLOW_INSECURE_WEBHOOK', false),
     ],
 
     'yandex' => [

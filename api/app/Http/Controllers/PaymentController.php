@@ -36,8 +36,10 @@ class PaymentController extends Controller
             }
         }
 
-        // В production проверяем IP, в dev — пропускаем
-        if (!$ipAllowed && app()->isProduction()) {
+        // IP-allowlist применяется во ВСЕХ окружениях. Обойти его можно только
+        // явным флагом YUKASSA_ALLOW_INSECURE_WEBHOOK=true (для локальной разработки),
+        // а не неявно по APP_ENV (staging/preview не должны принимать поддельные вебхуки).
+        if (!$ipAllowed && !config('services.yookassa.allow_insecure_webhook', false)) {
             Log::warning("YooKassa webhook: rejected IP {$clientIp}");
             return response()->json(['status' => 'forbidden'], 403);
         }

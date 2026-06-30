@@ -24,6 +24,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             \App\Http\Middleware\AuthTokenFromCookie::class,
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        ], append: [
+            // В Laravel 11 throttle:api НЕ навешивается на группу api автоматически —
+            // включаем базовый лимит явно (иначе большинство публичных эндпоинтов без лимита).
+            'throttle:api',
         ]);
 
         // auth_token хранится как httpOnly-cookie и читается как сырой Bearer-токен —

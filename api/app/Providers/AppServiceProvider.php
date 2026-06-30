@@ -28,15 +28,23 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
-        // Auth endpoints: 5 attempts/min (brute force protection)
+        // Auth endpoints: brute-force protection.
+        // Два лимита: по (email+IP) И жёсткий потолок по одному IP — чтобы
+        // перебор паролей по списку email (password spraying) не обходил лимит
+        // простой сменой email в каждом запросе.
         RateLimiter::for('auth', function (Request $request) {
-            return Limit::perMinute(5)->by(
-                $request->input('email', '') . '|' . $request->ip()
-            )->response(function () {
+            $tooMany = function () {
                 return response()->json([
                     'message' => 'Слишком много попыток. Подождите минуту.',
                 ], 429);
-            });
+            };
+
+            return [
+                Limit::perMinute(5)
+                    ->by(strtolower((string) $request->input('email', '')) . '|' . $request->ip())
+                    ->response($tooMany),
+                Limit::perMinute(20)->by($request->ip())->response($tooMany),
+            ];
         });
 
         // Contact form: 3/min
