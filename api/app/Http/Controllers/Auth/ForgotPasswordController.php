@@ -69,8 +69,9 @@ class ForgotPasswordController extends Controller
             return response()->json(['message' => 'Недействительный или просроченный токен.'], 422);
         }
 
-        // Токен старше 60 минут
-        if (now()->diffInMinutes($record->created_at) > 60) {
+        // Токен старше 60 минут. created_at приходит строкой из query builder —
+        // приводим к Carbon и сравниваем без знака (в Carbon 3 diffInMinutes знаковый).
+        if (\Illuminate\Support\Carbon::parse($record->created_at)->lt(now()->subMinutes(60))) {
             DB::table('password_reset_tokens')->where('email', $request->email)->delete();
             return response()->json(['message' => 'Токен истёк. Запросите сброс заново.'], 422);
         }

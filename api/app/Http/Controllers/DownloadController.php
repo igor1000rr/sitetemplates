@@ -45,25 +45,38 @@ class DownloadController extends Controller
      */
     public function downloadBySubscription(Request $request, Template $template): JsonResponse
     {
+        // Подписка даёт доступ только к опубликованным шаблонам,
+        // не к черновикам/модерации/архиву других авторов.
+        abort_unless($template->status === 'published', 404, 'Шаблон не найден');
+
         $user = $request->user();
 
         // Проверяем активную подписку
-        $sub = Subscription::where('user_id', $user->id)->active()->first();
+        $sub = Subscription::where('user_id', $user->id)->active()->with('plan')->first();
 
         if (!$sub) {
             return response()->json(['message' => 'Нет активной подписки'], 403);
         }
 
-        if (!$sub->canDownload()) {
-            return response()->json([
-                'message' => 'Достигнут лимит скачиваний в этом месяце',
-                'downloads_used' => $sub->downloads_used,
-                'downloads_limit' => $sub->plan->downloads_per_month,
-            ], 429);
-        }
+        $limit = $sub->plan?->downloads_per_month ?? -1;
 
-        // Записываем использование
-        $sub->recordDownload();
+        if ($limit !== -1) {
+            // Атомарно увеличиваем счётчик с проверкой лимита — без гонки
+            $affected = Subscription::whereKey($sub->id)
+                ->where('downloads_used', '<', $limit)
+                ->increment('downloads_used');
+
+            if ($affected === 0) {
+                return response()->json([
+                    'message' => 'Достигнут лимит скачиваний в этом месяце',
+                    'downloads_used' => $sub->downloads_used,
+                    'downloads_limit' => $limit,
+                ], 429);
+            }
+        } else {
+            // Безлимит — счётчик ведём для статистики
+            Subscription::whereKey($sub->id)->increment('downloads_used');
+        }
 
         return $this->generateDownload($request, $template);
     }
@@ -74,6 +87,9 @@ class DownloadController extends Controller
      */
     public function checkAccess(Request $request, Template $template): JsonResponse
     {
+        // Не раскрываем существование/доступ для неопубликованных шаблонов
+        abort_unless($template->status === 'published', 404, 'Шаблон не найден');
+
         $user = $request->user();
 
         // 1. Куплен через заказ?

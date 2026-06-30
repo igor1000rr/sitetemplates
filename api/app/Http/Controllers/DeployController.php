@@ -27,12 +27,13 @@ class DeployController extends Controller
         ]);
 
         // Защита от SSRF: не позволяем серверу подключаться к приватным/служебным адресам
-        if ($this->isHostBlocked($data['host'])) {
+        if (\App\Support\SsrfGuard::isHostBlocked($data['host'])) {
             return response()->json(['message' => 'Недопустимый адрес хоста.'], 422);
         }
 
         $user = $request->user();
-        $template = Template::findOrFail($data['template_id']);
+        // Деплоить можно только опубликованные шаблоны
+        $template = Template::published()->findOrFail($data['template_id']);
 
         // Проверяем доступ: покупка или подписка
         $purchased = $user->orders()
@@ -101,45 +102,6 @@ class DeployController extends Controller
             ->map(fn ($d) => $this->formatDeployment($d));
 
         return response()->json(['data' => $deployments]);
-    }
-
-    /**
-     * Блокируем приватные, loopback, link-local (вкл. 169.254.169.254) и
-     * прочие зарезервированные адреса — защита от SSRF в FTP/SFTP-деплое.
-     * Хост, который не резолвится, тоже блокируем.
-     */
-    private function isHostBlocked(string $host): bool
-    {
-        $host = trim($host, " \t\n\r\0\x0B[]"); // на случай [IPv6]
-
-        $ips = [];
-        if (filter_var($host, FILTER_VALIDATE_IP)) {
-            $ips[] = $host;
-        } else {
-            $v4 = @gethostbynamel($host);
-            if (is_array($v4)) {
-                $ips = array_merge($ips, $v4);
-            }
-            foreach (@dns_get_record($host, DNS_AAAA) ?: [] as $rec) {
-                if (!empty($rec['ipv6'])) {
-                    $ips[] = $rec['ipv6'];
-                }
-            }
-        }
-
-        if (empty($ips)) {
-            return true; // не резолвится → блокируем
-        }
-
-        foreach ($ips as $ip) {
-            // NO_PRIV_RANGE + NO_RES_RANGE отсекают 10/8, 172.16/12, 192.168/16,
-            // 127/8, 169.254/16, ::1, fc00::/7 и т.п.
-            if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private function formatDeployment(Deployment $d): array

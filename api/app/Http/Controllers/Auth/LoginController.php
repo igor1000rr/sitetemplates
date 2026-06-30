@@ -19,7 +19,12 @@ class LoginController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        // Постоянное по времени сравнение: даже если пользователя нет,
+        // выполняем bcrypt-проверку против заглушки — защита от перечисления
+        // аккаунтов по разнице во времени ответа.
+        $hash = $user?->password ?? '$2y$12$RcneTzhy4vxKXbCFyr5pBuK5Hkbrq1hgZG/Wwhr7Co4a8dpakTyua';
+
+        if (!Hash::check($request->password, $hash) || !$user) {
             return response()->json([
                 'message' => 'Неверный email или пароль',
             ], 401);

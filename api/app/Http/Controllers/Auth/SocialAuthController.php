@@ -22,10 +22,17 @@ class SocialAuthController extends Controller
             return response()->json(['message' => 'Неподдерживаемый провайдер'], 400);
         }
 
+        // Анти-CSRF для OAuth: одноразовый state, который проверим в callback.
+        // Поток stateless (без сессии), поэтому state храним в кэше и добавляем в URL сами.
+        $state = Str::random(40);
+        Cache::put("oauth_state:{$state}", $provider, now()->addMinutes(10));
+
         $url = Socialite::driver($provider)
             ->stateless()
             ->redirect()
             ->getTargetUrl();
+
+        $url .= (str_contains($url, '?') ? '&' : '?') . 'state=' . $state;
 
         return response()->json(['url' => $url]);
     }
@@ -36,20 +43,30 @@ class SocialAuthController extends Controller
             return response()->json(['message' => 'Неподдерживаемый провайдер'], 400);
         }
 
+        $frontUrl = config('app.frontend_url', 'http://localhost:3000');
+
+        // Проверяем одноразовый state (CSRF-защита OAuth)
+        $state = $request->query('state');
+        if (!$state || Cache::pull("oauth_state:{$state}") !== $provider) {
+            return redirect($frontUrl . '/auth/login?error=invalid_state');
+        }
+
         try {
             $socialUser = Socialite::driver($provider)->stateless()->user();
         } catch (\Exception $e) {
-            // Редирект на фронт с ошибкой
-            $frontUrl = config('app.frontend_url', 'http://localhost:3000');
             return redirect($frontUrl . '/auth/login?error=social_auth_failed');
         }
 
         $email = $socialUser->getEmail();
 
         if (!$email) {
-            $frontUrl = config('app.frontend_url', 'http://localhost:3000');
             return redirect($frontUrl . '/auth/login?error=no_email');
         }
+
+        // Подтверждён ли email на стороне провайдера
+        $raw = (array) ($socialUser->user ?? []);
+        $verifiedFlag = $raw['email_verified'] ?? $raw['verified_email'] ?? null;
+        $emailVerified = $verifiedFlag === true || $verifiedFlag === 'true' || $verifiedFlag === 1;
 
         // Ищем или создаём пользователя
         $user = User::where('email', $email)->first();
@@ -61,13 +78,22 @@ class SocialAuthController extends Controller
                 'name' => $socialUser->getName() ?? explode('@', $email)[0],
                 'email' => $email,
                 'password' => Hash::make(Str::random(32)),
-                'email_verified_at' => now(),
+                'email_verified_at' => $emailVerified ? now() : null,
                 'social_provider' => $provider,
                 'social_id' => $socialUser->getId(),
                 'avatar' => $socialUser->getAvatar(),
             ]);
         } else {
-            // Обновляем social данные
+            $alreadyLinked = $user->social_provider === $provider
+                && $user->social_id === (string) $socialUser->getId();
+
+            // К существующему аккаунту привязываем автоматически только если
+            // провайдер подтвердил email — иначе возможен захват чужого аккаунта
+            // через регистрацию у провайдера с чужим (неподтверждённым) email.
+            if (!$alreadyLinked && !$emailVerified) {
+                return redirect($frontUrl . '/auth/login?error=email_not_verified');
+            }
+
             $user->update([
                 'social_provider' => $user->social_provider ?? $provider,
                 'social_id' => $user->social_id ?? $socialUser->getId(),

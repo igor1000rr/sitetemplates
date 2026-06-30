@@ -90,7 +90,12 @@ class ProcessDeployment implements ShouldQueue
     {
         $d->appendLog("Подключение FTP: {$d->host}:{$d->port}");
 
-        $ftp = @ftp_connect($d->host, $d->port, 30);
+        // Повторно резолвим и проверяем хост ПЕРЕД подключением, затем подключаемся
+        // к разрешённому IP-литералу — защита от DNS-rebinding/TOCTOU (SSRF).
+        $ip = \App\Support\SsrfGuard::safeIp($d->host);
+        if (!$ip) throw new \Exception("Недопустимый или неразрешимый хост: {$d->host}");
+
+        $ftp = @ftp_connect($ip, $d->port, 30);
         if (!$ftp) throw new \Exception("Не удалось подключиться к FTP {$d->host}:{$d->port}");
 
         if (!@ftp_login($ftp, $d->username, $d->decrypted_password)) {
@@ -138,7 +143,11 @@ class ProcessDeployment implements ShouldQueue
     {
         $d->appendLog("Подключение SFTP: {$d->host}:{$d->port}");
 
-        $connection = @ssh2_connect($d->host, $d->port);
+        // Резолвим и валидируем хост перед подключением, подключаемся к IP (anti-SSRF)
+        $ip = \App\Support\SsrfGuard::safeIp($d->host);
+        if (!$ip) throw new \Exception("Недопустимый или неразрешимый хост: {$d->host}");
+
+        $connection = @ssh2_connect($ip, $d->port);
         if (!$connection) throw new \Exception("Не удалось подключиться к SFTP");
 
         if (!@ssh2_auth_password($connection, $d->username, $d->decrypted_password)) {
