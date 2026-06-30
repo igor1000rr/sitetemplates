@@ -4,6 +4,33 @@
  * ограничена — это НЕ полноценный санитайзер. Для контента от недоверенных
  * пользователей используйте DOMPurify / sanitize-html (defense-in-depth).
  */
+
+const ALLOWED_SCHEMES = ['http', 'https', 'mailto', 'tel']
+
+/**
+ * Нормализуем значение URL и пропускаем только безопасные схемы.
+ * Декодируем числовые/hex-сущности и убираем пробелы/управляющие символы,
+ * которыми обходят простое сравнение строки "javascript:".
+ */
+function sanitizeUrl(raw: string): string {
+  const normalized = raw
+    .replace(/&#x([0-9a-fA-F]+);?/g, (_, h) => String.fromCharCode(parseInt(h, 16)))
+    .replace(/&#(\d+);?/g, (_, d) => String.fromCharCode(parseInt(d, 10)))
+    .replace(/[\u0000-\u0020\u007F]+/g, '')
+    .toLowerCase()
+
+  if (!normalized) return '#'
+
+  // data:image/* оставляем (картинки), любые другие data: — запрещаем
+  if (normalized.startsWith('data:image/')) return raw
+
+  const scheme = normalized.match(/^([a-z][a-z0-9+.-]*):/)
+  // нет схемы → относительная ссылка / якорь / query — разрешено
+  if (!scheme) return raw
+
+  return ALLOWED_SCHEMES.includes(scheme[1]) ? raw : '#'
+}
+
 export function sanitizeHtml(html: string): string {
   if (!html) return ''
 
@@ -26,11 +53,15 @@ export function sanitizeHtml(html: string): string {
     .replace(/\son\w+\s*=\s*"[^"]*"/gi, '')
     .replace(/\son\w+\s*=\s*'[^']*'/gi, '')
     .replace(/\son\w+\s*=\s*[^\s>]+/gi, '')
-    // 4. javascript: в href/src/xlink:href (любое кавычкирование)
-    .replace(/(\b(?:href|src|xlink:href)\s*=\s*)(["'])\s*javascript:[^"']*\2/gi, '$1$2#$2')
-    .replace(/(\b(?:href|src|xlink:href)\s*=\s*)javascript:[^\s>]+/gi, '$1"#"')
-    // 5. data:text/html (XSS); data:image/* намеренно сохраняем
-    .replace(/(\b(?:href|src|xlink:href)\s*=\s*)(["'])\s*data:text\/html[^"']*\2/gi, '$1$2#$2')
+    // 4. href/src/xlink:href: пропускаем только разрешённые схемы (allowlist),
+    //    нормализуя кавычки и декодируя обфускацию схемы
+    .replace(
+      /(\b(?:href|src|xlink:href)\s*=\s*)(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi,
+      (_full, prefix, dq, sq, uq) => {
+        const value = dq ?? sq ?? uq ?? ''
+        return `${prefix}"${sanitizeUrl(value)}"`
+      }
+    )
 
   return out
 }

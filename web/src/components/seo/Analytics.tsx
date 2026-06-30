@@ -1,11 +1,25 @@
 'use client'
 
 import Script from 'next/script'
+import { useEffect, useState } from 'react'
+import { hasAnalyticsConsent, CONSENT_EVENT } from '@/components/shared/CookieConsent'
 
 const YM_ID = process.env.NEXT_PUBLIC_YM_ID
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID
 
 export default function Analytics() {
+  // Трекеры (вкл. webvisor / session replay) грузим ТОЛЬКО после согласия на cookie.
+  const [consent, setConsent] = useState(false)
+
+  useEffect(() => {
+    setConsent(hasAnalyticsConsent())
+    const handler = (e: Event) => setConsent((e as CustomEvent).detail === 'accepted')
+    window.addEventListener(CONSENT_EVENT, handler)
+    return () => window.removeEventListener(CONSENT_EVENT, handler)
+  }, [])
+
+  if (!consent) return null
+
   return (
     <>
       {/* Yandex.Metrika */}
