@@ -45,6 +45,12 @@ return new class extends Migration
 
         // Защита от двойного начисления авторам при гонке/ретрае вебхука.
         if (Schema::hasTable('author_earnings') && !$this->indexExists('author_earnings', 'author_earnings_order_item_id_unique')) {
+            // На старых БД мог остаться дубль (до фикса идемпотентности) — иначе
+            // добавление UNIQUE упало бы и оборвало миграцию. Чистим, оставляя минимальный id.
+            if (DB::getDriverName() === 'pgsql') {
+                DB::statement('DELETE FROM author_earnings a USING author_earnings b WHERE a.order_item_id = b.order_item_id AND a.id > b.id');
+            }
+
             Schema::table('author_earnings', function (Blueprint $table) {
                 $table->unique('order_item_id');
             });
