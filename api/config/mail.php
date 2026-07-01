@@ -6,13 +6,14 @@ return [
     'default' => env('MAIL_MAILER', 'smtp'),
 
     'mailers' => [
+        // Resend через SMTP: username = 'resend', password = Resend API key
         'smtp' => [
             'transport' => 'smtp',
             'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST', 'smtp.yandex.ru'),
-            'port' => env('MAIL_PORT', 465),
-            'encryption' => env('MAIL_ENCRYPTION', 'ssl'),
-            'username' => env('MAIL_USERNAME'),
+            'host' => env('MAIL_HOST', 'smtp.resend.com'),
+            'port' => env('MAIL_PORT', 587),
+            'encryption' => env('MAIL_ENCRYPTION', 'tls'),
+            'username' => env('MAIL_USERNAME', 'resend'),
             'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
         ],

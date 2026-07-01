@@ -63,10 +63,14 @@ class SocialAuthController extends Controller
             return redirect($frontUrl . '/auth/login?error=no_email');
         }
 
-        // Подтверждён ли email на стороне провайдера
+        // Подтверждён ли email на стороне провайдера.
+        // Google отдаёт явный признак email_verified/verified_email.
+        // Yandex возвращает только собственный email аккаунта (его нельзя задать
+        // произвольным чужим неподтверждённым адресом) — поэтому считаем верифицированным.
         $raw = (array) ($socialUser->user ?? []);
         $verifiedFlag = $raw['email_verified'] ?? $raw['verified_email'] ?? null;
-        $emailVerified = $verifiedFlag === true || $verifiedFlag === 'true' || $verifiedFlag === 1;
+        $emailVerified = $verifiedFlag === true || $verifiedFlag === 'true' || $verifiedFlag === 1
+            || $provider === 'yandex';
 
         // Ищем или создаём пользователя
         $user = User::where('email', $email)->first();
